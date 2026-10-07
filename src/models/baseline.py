@@ -1,165 +1,184 @@
-# baseline.py
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, StackingClassifier, VotingClassifier
-from sklearn.svm import SVC
-from sklearn.naive_bayes import MultinomialNB
-from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from sklearn.preprocessing import LabelEncoder
-from imblearn.over_sampling import SMOTE
+"""Classical ML Baseline Models (TF-IDF + LR/RF/XGB/SVM/MNB + Ensembles).
+
+Reads 'text_classic' from data/processed/train.csv, val.csv, and test.csv.
+Trains tuned classifiers and logs evaluation metrics to models/model_metrics.csv.
+"""
+
 from collections import Counter
+from pathlib import Path
+from typing import Dict, Any, List
+import logging
 import joblib
+import pandas as pd
+from imblearn.over_sampling import SMOTE
+from sklearn.ensemble import RandomForestClassifier, StackingClassifier, VotingClassifier
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
 
-# -----------------------------
-# Load datasets
-# -----------------------------
-train_df = pd.read_csv("data/processed/train.csv")
-val_df   = pd.read_csv("data/processed/val.csv")
-test_df  = pd.read_csv("data/processed/test.csv")
+logger = logging.getLogger(__name__)
 
-train_df = train_df.dropna(subset=['text','label'])
-val_df   = val_df.dropna(subset=['text','label'])
-test_df  = test_df.dropna(subset=['text','label'])
 
-X_train, y_train = train_df['text'].fillna(""), train_df['label']
-X_val, y_val     = val_df['text'].fillna(""), val_df['label']
-X_test, y_test   = test_df['text'].fillna(""), test_df['label']
+def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFrame:
+    """Train all baseline classical models and save artifacts and metrics.
 
-print("Train class distribution:", Counter(y_train))
+    Args:
+        data_dir: Path to directory containing train.csv, val.csv, test.csv.
+        models_dir: Path to directory to store trained .pkl models and metrics.
 
-# -----------------------------
-# Encode labels
-# -----------------------------
-le = LabelEncoder()
-y_train_enc = le.fit_transform(y_train)
-y_val_enc   = le.transform(y_val)
-y_test_enc  = le.transform(y_test)
+    Returns:
+        pd.DataFrame containing comparison metrics.
+    """
+    root = Path(__file__).resolve().parent.parent.parent
+    if data_dir is None:
+        data_dir = root / "data" / "processed"
+    if models_dir is None:
+        models_dir = root / "models"
 
-# -----------------------------
-# Feature extraction
-# -----------------------------
-tfidf_vec = TfidfVectorizer(max_features=7000, ngram_range=(1,3))
-X_train_tfidf = tfidf_vec.fit_transform(X_train)
-X_val_tfidf   = tfidf_vec.transform(X_val)
-X_test_tfidf  = tfidf_vec.transform(X_test)
+    models_dir.mkdir(parents=True, exist_ok=True)
 
-bow_vec = CountVectorizer(max_features=7000, ngram_range=(1,3))
-X_train_bow = bow_vec.fit_transform(X_train)
-X_test_bow  = bow_vec.transform(X_test)
+    train_path = data_dir / "train.csv"
+    val_path = data_dir / "val.csv"
+    test_path = data_dir / "test.csv"
 
-# -----------------------------
-# Handle class imbalance
-# -----------------------------
-smote = SMOTE(random_state=42)
-X_train_tfidf_res, y_train_res = smote.fit_resample(X_train_tfidf, y_train_enc)
-X_train_bow_res, _ = smote.fit_resample(X_train_bow, y_train_enc)
+    if not (train_path.exists() and test_path.exists()):
+        raise FileNotFoundError(f"Processed datasets not found in {data_dir}. Run split_data.py first.")
 
-# -----------------------------
-# Define tuned base models
-# -----------------------------
-models = {
-    "LogisticRegression": LogisticRegression(max_iter=1500, C=1.5, class_weight='balanced', random_state=42),
-    "RandomForest": RandomForestClassifier(n_estimators=500, max_depth=None, min_samples_leaf=2,
-                                           class_weight='balanced', random_state=42),
-    "XGBoost": XGBClassifier(n_estimators=500, max_depth=6, learning_rate=0.1,subsample=0.8, 
-                              colsample_bytree=0.8, eval_metric='mlogloss', random_state=42),
-    "SVM": SVC(kernel='linear', C=2.0, probability=True, class_weight='balanced', random_state=42),
-    "MNB": MultinomialNB()
-}
+    train_df = pd.read_csv(train_path).dropna(subset=["text_classic", "label"])
+    val_df = pd.read_csv(val_path).dropna(subset=["text_classic", "label"]) if val_path.exists() else None
+    test_df = pd.read_csv(test_path).dropna(subset=["text_classic", "label"])
 
-metrics_list = []
-stack_estimators = []
+    X_train = train_df["text_classic"].astype(str)
+    y_train = train_df["label"].astype(str)
 
-# -----------------------------
-# Train base models & collect metrics
-# -----------------------------
-for name, model in models.items():
-    if name == "MNB":
-        model.fit(X_train_bow_res, y_train_res)
-        y_pred = model.predict(X_test_bow)
-    else:
-        model.fit(X_train_tfidf_res, y_train_res)
-        y_pred = model.predict(X_test_tfidf)
-        stack_estimators.append((name, model))  # strong models for stacking
+    X_test = test_df["text_classic"].astype(str)
+    y_test = test_df["label"].astype(str)
 
-    y_pred_labels = le.inverse_transform(y_pred)
-    acc = accuracy_score(y_test, y_pred_labels)
-    precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred_labels, average='weighted')
-    
+    logger.info(f"Train class distribution: {Counter(y_train)}")
+
+    # Encode labels
+    le = LabelEncoder()
+    y_train_enc = le.fit_transform(y_train)
+    y_test_enc = le.transform(y_test)
+    joblib.dump(le, models_dir / "baseline_label_encoder.pkl")
+
+    # Feature extraction (TF-IDF & Count)
+    tfidf_vec = TfidfVectorizer(max_features=7000, ngram_range=(1, 3))
+    X_train_tfidf = tfidf_vec.fit_transform(X_train)
+    X_test_tfidf = tfidf_vec.transform(X_test)
+
+    bow_vec = CountVectorizer(max_features=7000, ngram_range=(1, 3))
+    X_train_bow = bow_vec.fit_transform(X_train)
+    X_test_bow = bow_vec.transform(X_test)
+
+    # Handle class imbalance
+    smote = SMOTE(random_state=42)
+    X_train_tfidf_res, y_train_res = smote.fit_resample(X_train_tfidf, y_train_enc)
+    X_train_bow_res, _ = smote.fit_resample(X_train_bow, y_train_enc)
+
+    # Define base models
+    base_models = {
+        "LogisticRegression": LogisticRegression(max_iter=1500, C=1.5, class_weight="balanced", random_state=42),
+        "RandomForest": RandomForestClassifier(n_estimators=300, min_samples_leaf=2, class_weight="balanced", random_state=42),
+        "XGBoost": XGBClassifier(n_estimators=300, max_depth=6, learning_rate=0.1, subsample=0.8, colsample_bytree=0.8, eval_metric="mlogloss", random_state=42),
+        "SVM": SVC(kernel="linear", C=2.0, probability=True, class_weight="balanced", random_state=42),
+        "MNB": MultinomialNB(),
+    }
+
+    metrics_list: List[Dict[str, Any]] = []
+    stack_estimators = []
+
+    for name, model in base_models.items():
+        logger.info(f"Training {name}...")
+        if name == "MNB":
+            model.fit(X_train_bow_res, y_train_res)
+            y_pred = model.predict(X_test_bow)
+        else:
+            model.fit(X_train_tfidf_res, y_train_res)
+            y_pred = model.predict(X_test_tfidf)
+            stack_estimators.append((name, model))
+
+        y_pred_labels = le.inverse_transform(y_pred)
+        acc = accuracy_score(y_test, y_pred_labels)
+        prec, rec, f1, _ = precision_recall_fscore_support(y_test, y_pred_labels, average="weighted", zero_division=0)
+
+        metrics_list.append({
+            "Model": name,
+            "Accuracy": round(acc, 4),
+            "Precision": round(prec, 4),
+            "Recall": round(rec, 4),
+            "F1": round(f1, 4),
+        })
+        joblib.dump(model, models_dir / f"{name}_model.pkl")
+
+    # Stacking ensemble
+    logger.info("Training Stacking Ensemble...")
+    stacking = StackingClassifier(
+        estimators=stack_estimators,
+        final_estimator=LogisticRegression(max_iter=1500, class_weight="balanced", random_state=42),
+        cv=5,
+        passthrough=True,
+        stack_method="predict_proba",
+    )
+    stacking.fit(X_train_tfidf_res, y_train_res)
+    y_pred_stack = stacking.predict(X_test_tfidf)
+    y_pred_stack_labels = le.inverse_transform(y_pred_stack)
+    acc_stack = accuracy_score(y_test, y_pred_stack_labels)
+    prec_s, rec_s, f1_s, _ = precision_recall_fscore_support(y_test, y_pred_stack_labels, average="weighted", zero_division=0)
     metrics_list.append({
-        "Model": name,
-        "Accuracy": acc,
-        "Precision": precision,
-        "Recall": recall,
-        "F1": f1
+        "Model": "StackingEnsemble",
+        "Accuracy": round(acc_stack, 4),
+        "Precision": round(prec_s, 4),
+        "Recall": round(rec_s, 4),
+        "F1": round(f1_s, 4),
     })
-    joblib.dump(model, f'models/{name}_model.pkl')
+    joblib.dump(stacking, models_dir / "stacking_ensemble_model.pkl")
 
-# -----------------------------
-# Stacking ensemble
-# -----------------------------
-stacking = StackingClassifier(
-    estimators=stack_estimators,
-    final_estimator=LogisticRegression(max_iter=1500, class_weight='balanced', random_state=42),
-    cv=5,
-    passthrough=True,
-    stack_method='predict_proba'
-)
-stacking.fit(X_train_tfidf_res, y_train_res)
-y_pred_stack = stacking.predict(X_test_tfidf)
-y_pred_stack_labels = le.inverse_transform(y_pred_stack)
+    # Soft Voting ensemble
+    logger.info("Training Soft Voting Ensemble...")
+    voting_estimators = [
+        ("Stacking", stacking),
+        ("XGBoost", base_models["XGBoost"]),
+        ("LogisticRegression", base_models["LogisticRegression"]),
+        ("SVM", base_models["SVM"]),
+    ]
+    voting = VotingClassifier(estimators=voting_estimators, voting="soft", weights=[3, 3, 2, 2])
+    voting.fit(X_train_tfidf_res, y_train_res)
+    y_pred_vote = voting.predict(X_test_tfidf)
+    y_pred_vote_labels = le.inverse_transform(y_pred_vote)
+    acc_vote = accuracy_score(y_test, y_pred_vote_labels)
+    prec_v, rec_v, f1_v, _ = precision_recall_fscore_support(y_test, y_pred_vote_labels, average="weighted", zero_division=0)
+    metrics_list.append({
+        "Model": "WeightedSoftVotingEnsemble",
+        "Accuracy": round(acc_vote, 4),
+        "Precision": round(prec_v, 4),
+        "Recall": round(rec_v, 4),
+        "F1": round(f1_v, 4),
+    })
+    joblib.dump(voting, models_dir / "weighted_soft_voting_model.pkl")
 
-acc, precision, recall, f1, _ = accuracy_score(y_test, y_pred_stack_labels), *precision_recall_fscore_support(y_test, y_pred_stack_labels, average='weighted')
-metrics_list.append({
-    "Model": "StackingEnsemble",
-    "Accuracy": acc,
-    "Precision": precision,
-    "Recall": recall,
-    "F1": f1
-})
-joblib.dump(stacking, 'models/stacking_ensemble_model.pkl')
+    # Save vectorizers and metrics table
+    joblib.dump(tfidf_vec, models_dir / "tfidf_vectorizer.pkl")
+    joblib.dump(bow_vec, models_dir / "bow_vectorizer.pkl")
 
-# -----------------------------
-# Weighted Soft Voting ensemble (include stacking + strong models)
-# -----------------------------
-voting_estimators = [
-    ('Stacking', stacking),
-    ('XGBoost', models['XGBoost']),
-    ('LogisticRegression', models['LogisticRegression']),
-    ('SVM', models['SVM'])
-]
+    metrics_df = pd.DataFrame(metrics_list)
+    metrics_df.to_csv(models_dir / "model_metrics.csv", index=False)
+    logger.info(f"Saved metrics to {models_dir / 'model_metrics.csv'}")
 
-# Assign higher weight to stronger models based on validation performance
-weights = [3, 3, 2, 2]  # stacking + XGBoost have more weight
+    return metrics_df
 
-voting_ensemble = VotingClassifier(
-    estimators=voting_estimators,
-    voting='soft',
-    weights=weights
-)
-voting_ensemble.fit(X_train_tfidf_res, y_train_res)
-y_pred_vote = voting_ensemble.predict(X_test_tfidf)
-y_pred_vote_labels = le.inverse_transform(y_pred_vote)
 
-acc, precision, recall, f1, _ = accuracy_score(y_test, y_pred_vote_labels), *precision_recall_fscore_support(y_test, y_pred_vote_labels, average='weighted')
-metrics_list.append({
-    "Model": "WeightedSoftVotingEnsemble",
-    "Accuracy": acc,
-    "Precision": precision,
-    "Recall": recall,
-    "F1": f1
-})
-joblib.dump(voting_ensemble, 'models/weighted_soft_voting_model.pkl')
+def main() -> None:
+    """CLI entrypoint."""
+    logging.basicConfig(level=logging.INFO)
+    df = train_baselines()
+    print("\nBaseline Training Results:")
+    print(df.to_string(index=False))
 
-# -----------------------------
-# Save metrics & vectorizers
-# -----------------------------
-metrics_df = pd.DataFrame(metrics_list)
-metrics_df.to_csv("models/model_metrics.csv", index=False)
 
-joblib.dump(tfidf_vec, 'models/tfidf_vectorizer.pkl')
-joblib.dump(bow_vec, 'models/bow_vectorizer.pkl')
-
-print(" All base models, stacking and weighted soft voting ensemble trained successfully!")
+if __name__ == "__main__":
+    main()
