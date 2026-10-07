@@ -161,7 +161,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Space Grotesk',sans-serif
       <div style="font-size:18px;font-weight:700;letter-spacing:-.4px;">Market Sentiment Dashboard</div>
       <small style="color:#4a5568;">
         <span class="live"></span>
-        {% if news and news|length > 0 %}Last updated: {{ news[0].scraped_at[:16] }}{% else %}Awaiting data...{% endif %}
+        {% if generated_at %}Last updated: {{ generated_at[:16] }}{% elif news and news|length > 0 %}Last updated: {{ (news[0].get('scraped_at', news[0].get('published_at', '')))[:16] }}{% else %}Awaiting data...{% endif %}
       </small>
     </div>
     <div class="topbar-right">

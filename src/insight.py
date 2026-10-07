@@ -137,8 +137,11 @@ def aggregate_accuracy(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
 
     return {
         "accuracy_pct": overall_pct,
+        "accuracy": overall_pct,
         "correct": overall_correct,
+        "correct_predictions": overall_correct,
         "total": overall_total,
+        "total_predictions": overall_total,
         "mismatches": overall_total - overall_correct,
         "by_company": comp_summary,
     }
