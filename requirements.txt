@@ -1,0 +1,54 @@
+# ──────────────────────────────────────────────
+# Senti-Lytics Requirements
+# ──────────────────────────────────────────────
+# Install: pip install -r requirements.txt
+# Tested on Python 3.12
+# ──────────────────────────────────────────────
+
+# Transformers and NLP
+transformers>=4.33.0
+tokenizers>=0.13.3
+datasets
+nltk
+huggingface-hub>=0.15.1
+
+# PyTorch and acceleration
+torch
+accelerate>=0.20.1
+safetensors>=0.3.1
+
+# Data processing
+numpy>=1.17
+pandas
+scikit-learn
+pyyaml>=5.1
+joblib
+
+# Classical ML models
+xgboost
+imbalanced-learn
+
+# Sentiment analysis
+vaderSentiment
+
+# Finance and APIs
+yfinance
+requests
+
+# Web server
+flask
+gunicorn
+apscheduler
+
+# Utilities
+regex
+tqdm>=4.27
+fsspec>=2023.5.0
+packaging>=20.0
+typing-extensions>=3.7.4.3
+colorama
+python-dotenv
+
+# Dev / Testing
+pytest
+pytest-cov

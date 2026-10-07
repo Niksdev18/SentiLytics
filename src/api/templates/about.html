@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentilytics — About</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  {% raw %}<style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #141c2e;
+      --bg-card-hover: #1a2440;
+      --border: rgba(99,179,237,0.12);
+      --accent-blue: #63b3ed;
+      --accent-green: #68d391;
+      --accent-red: #fc8181;
+      --accent-yellow: #f6e05e;
+      --accent-purple: #b794f4;
+      --text-primary: #e2e8f0;
+      --text-secondary: #718096;
+      --text-muted: #4a5568;
+      --sidebar-width: 240px;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f0f4f8;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f7fafc;
+      --border: rgba(0,0,0,0.08);
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #a0aec0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed; left: 0; top: 0;
+      width: var(--sidebar-width); height: 100vh;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 24px 16px; z-index: 100;
+    }
+
+    .sidebar-logo {
+      display: flex; align-items: center;
+      gap: 10px; margin-bottom: 36px; padding: 0 8px;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--accent-blue); }
+
+    .nav-section {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-muted); padding: 0 8px;
+      margin-bottom: 8px; margin-top: 16px;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.2s; margin-bottom: 2px;
+    }
+
+    .nav-item:hover, .nav-item.active { background: var(--bg-card); color: var(--accent-blue); }
+    .nav-item.active { border-left: 3px solid var(--accent-blue); }
+    .nav-item i { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto; padding: 12px;
+      border-radius: 10px; background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+
+    .model-badge { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--accent-green); display: block; }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-width); min-height: 100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .theme-toggle {
+      width: 36px; height: 36px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer;
+      color: var(--text-secondary); transition: all 0.2s; font-size: 16px;
+    }
+    .theme-toggle:hover { color: var(--accent-yellow); border-color: var(--accent-yellow); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 64px 60px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(circle, rgba(99,179,237,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .page-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent-blue);
+      background: rgba(99,179,237,0.1);
+      border: 1px solid rgba(99,179,237,0.2);
+      padding: 6px 14px; border-radius: 20px; margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-size: 48px; font-weight: 700;
+      letter-spacing: -1.5px; margin-bottom: 18px;
+    }
+
+    .page-title .highlight {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .page-desc {
+      font-size: 17px; line-height: 1.7;
+      color: var(--text-secondary); max-width: 580px;
+      margin: 0 auto 60px;
+    }
+
+    /* ── PROJECT OVERVIEW ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 60px 60px;
+    }
+
+    .overview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+
+    .overview-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .ov-icon { font-size: 28px; margin-bottom: 14px; }
+    .ov-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .ov-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── TECH STACK ── */
+    .tech-section {
+      padding: 60px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      text-align: center; margin-bottom: 48px;
+    }
+
+    .section-eyebrow {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--accent-blue); margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 32px; font-weight: 700;
+      letter-spacing: -0.8px; margin-bottom: 12px;
+    }
+
+    .section-sub { font-size: 15px; color: var(--text-secondary); }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .tech-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: default;
+    }
+
+    .tech-chip:hover { border-color: var(--accent-blue); }
+
+    .tech-chip-icon { font-size: 22px; margin-bottom: 8px; }
+    .tech-chip-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .tech-chip-cat { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── TEAM SECTION ── */
+    .team-section { padding: 60px; }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .team-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-card::after {
+      content: '';
+      position: absolute;
+      right: -20px; bottom: -20px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(99,179,237,0.05) 0%, transparent 70%);
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .team-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .team-card:hover::after { transform: scale(3); }
+
+    .team-avatar {
+      width: 72px; height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 700;
+      color: white; flex-shrink: 0;
+      letter-spacing: -1px;
+    }
+
+    /* Unique colors per team member */
+    .avatar-1 { background: linear-gradient(135deg, #63b3ed, #b794f4); }
+    .avatar-2 { background: linear-gradient(135deg, #68d391, #63b3ed); }
+    .avatar-3 { background: linear-gradient(135deg, #f6e05e, #fc8181); }
+    .avatar-4 { background: linear-gradient(135deg, #b794f4, #fc8181); }
+
+    .team-info { flex: 1; }
+
+    .team-name {
+      font-size: 17px; font-weight: 700;
+      letter-spacing: -0.3px; margin-bottom: 4px;
+    }
+
+    .team-role {
+      font-size: 13px; font-weight: 600;
+      color: var(--accent-blue); margin-bottom: 10px;
+    }
+
+    .team-skills {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+
+    .skill-pill {
+      font-size: 11px; font-weight: 600;
+      padding: 3px 9px; border-radius: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 60px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .footer-logo { font-size: 16px; font-weight: 700; }
+    .footer-logo span { color: var(--accent-blue); }
+    .footer-copy { font-size: 13px; color: var(--text-muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; padding: 16px 8px; }
+      .sidebar-logo .logo-text, .nav-item span, .nav-section, .sidebar-footer { display: none; }
+      .nav-item { justify-content: center; }
+      .main { margin-left: 60px; }
+      .page-header { padding: 40px 24px 0; }
+      .page-title { font-size: 32px; }
+      .overview-grid { grid-template-columns: 1fr; padding: 0 24px 40px; }
+      .tech-section, .team-section { padding: 40px 24px; }
+      .team-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .team-card {
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .team-card:nth-child(1) { animation-delay: 0.1s; transform: translateY(20px); }
+    .team-card:nth-child(2) { animation-delay: 0.2s; transform: translateY(20px); }
+    .team-card:nth-child(3) { animation-delay: 0.3s; transform: translateY(20px); }
+    .team-card:nth-child(4) { animation-delay: 0.4s; transform: translateY(20px); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 3px; }
+  </style>{% endraw %}
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">📊</div>
+    <div class="logo-text">Senti<span>lytics</span></div>
+  </div>
+
+  <div class="nav-section">Navigation</div>
+  <a href="/" class="nav-item"><i class="bi bi-house-door"></i> <span>Home</span></a>
+  <a href="/dashboard" class="nav-item"><i class="bi bi-bar-chart-line"></i> <span>Dashboard</span></a>
+  <a href="/about" class="nav-item active"><i class="bi bi-info-circle"></i> <span>About</span></a>
+
+  <div class="nav-section">Model</div>
+  <a href="#" class="nav-item"><i class="bi bi-cpu"></i> <span>FinBERT</span></a>
+  <a href="#" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Metrics</span></a>
+
+  <div class="sidebar-footer">
+    <span class="model-badge">● FinBERT Active</span>
+    <small style="color: var(--text-muted); font-size: 11px;">Accuracy: 92.14%</small>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div style="font-size: 13px; color: var(--text-muted);">
+      About the project and the team behind Sentilytics
+    </div>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+    </div>
+  </div>
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="page-eyebrow"><i class="bi bi-info-circle"></i> About Sentilytics</div>
+    <h1 class="page-title">Built to Make<br><span class="highlight">Markets Readable</span></h1>
+    <p class="page-desc">
+      Sentilytics is a final-year BTech project that combines transformer-based NLP,
+      ensemble machine learning, and real-time financial data to turn raw news into
+      actionable market intelligence.
+    </p>
+  </div>
+
+  <!-- ── PROJECT OVERVIEW ── -->
+  <div class="overview-grid">
+    <div class="overview-card">
+      <div class="ov-icon">🧠</div>
+      <div class="ov-title">FinBERT Transformer</div>
+      <div class="ov-desc">Fine-tuned on financial tone data with 90.03% test accuracy. Outperforms every classical ML baseline by ~4%.</div>
+    </div>
+    <div class="overview-card">
+      <div class="ov-icon">📊</div>
+      <div class="ov-title">7 Models Benchmarked</div>
+      <div class="ov-desc">Logistic Regression, SVM, XGBoost, Random Forest, Naive Bayes, Stacking & Voting Ensembles — all compared.</div>
+    </div>
+    <div class="overview-card">
+      <div class="ov-icon">📡</div>
+      <div class="ov-title">Real-Time Pipeline</div>
+      <div class="ov-desc">NewsAPI + yFinance integration fetches fresh data every 2 hours. Sentiment is always current with the market.</div>
+    </div>
+    <div class="overview-card">
+      <div class="ov-icon">💡</div>
+      <div class="ov-title">Smart Trading Signals</div>
+      <div class="ov-desc">Combines sentiment confidence + price movement direction to produce BUY / SELL / HOLD recommendations.</div>
+    </div>
+    <div class="overview-card">
+      <div class="ov-icon">🔌</div>
+      <div class="ov-title">REST API</div>
+      <div class="ov-desc">POST any financial text to <code style="color: var(--accent-blue); font-family: 'JetBrains Mono', monospace">/api/predict</code> and get sentiment + confidence back in JSON.</div>
+    </div>
+    <div class="overview-card">
+      <div class="ov-icon">🚀</div>
+      <div class="ov-title">Production Deployed</div>
+      <div class="ov-desc">Deployed on Render with gunicorn. FinBERT model hosted on HuggingFace Hub. Accessible from anywhere.</div>
+    </div>
+  </div>
+
+  <!-- ── TECH STACK ── -->
+  <div class="tech-section">
+    <div class="section-header">
+      <div class="section-eyebrow">Technology Stack</div>
+      <h2 class="section-title">Tools & Frameworks</h2>
+      <p class="section-sub">Built with industry-standard tools used in production ML systems.</p>
+    </div>
+
+    <div class="tech-grid">
+      <div class="tech-chip">
+        <div class="tech-chip-icon">🤗</div>
+        <div class="tech-chip-name">HuggingFace</div>
+        <div class="tech-chip-cat">Transformers</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">🔥</div>
+        <div class="tech-chip-name">PyTorch</div>
+        <div class="tech-chip-cat">Deep Learning</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">🐍</div>
+        <div class="tech-chip-name">scikit-learn</div>
+        <div class="tech-chip-cat">ML Baseline</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">⚡</div>
+        <div class="tech-chip-name">XGBoost</div>
+        <div class="tech-chip-cat">Gradient Boost</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">🌶️</div>
+        <div class="tech-chip-name">Flask</div>
+        <div class="tech-chip-cat">Web Backend</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">🐼</div>
+        <div class="tech-chip-name">Pandas</div>
+        <div class="tech-chip-cat">Data Processing</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">📈</div>
+        <div class="tech-chip-name">yFinance</div>
+        <div class="tech-chip-cat">Stock Data</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">📰</div>
+        <div class="tech-chip-name">NewsAPI</div>
+        <div class="tech-chip-cat">News Feed</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">📊</div>
+        <div class="tech-chip-name">Chart.js</div>
+        <div class="tech-chip-cat">Visualization</div>
+      </div>
+      <div class="tech-chip">
+        <div class="tech-chip-icon">🚀</div>
+        <div class="tech-chip-name">Render</div>
+        <div class="tech-chip-cat">Deployment</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TEAM ── -->
+  <div class="team-section">
+    <div class="section-header">
+      <div class="section-eyebrow">The Team</div>
+      <h2 class="section-title">Meet the Builders</h2>
+      <p class="section-sub">Four BTech students who built, trained, and shipped this from scratch.</p>
+    </div>
+
+    <div class="team-grid">
+
+      <!-- PRERNA VATS -->
+      <div class="team-card">
+        <div class="team-avatar avatar-1">PV</div>
+        <div class="team-info">
+          <div class="team-name">Prerna Vats</div>
+          <div class="team-role">Lead ML / NLP Developer</div>
+          <div class="team-skills">
+            <span class="skill-pill">FinBERT Training</span>
+            <span class="skill-pill">NLP Pipeline</span>
+            <span class="skill-pill">PyTorch</span>
+            <span class="skill-pill">Backend Integration</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KRISHNA BHARDWAJ -->
+      <div class="team-card">
+        <div class="team-avatar avatar-2">KB</div>
+        <div class="team-info">
+          <div class="team-name">Krishna Bhardwaj</div>
+          <div class="team-role">Data Engineer & Analytics</div>
+          <div class="team-skills">
+            <span class="skill-pill">Data Cleaning</span>
+            <span class="skill-pill">Feature Engineering</span>
+            <span class="skill-pill">Model Evaluation</span>
+            <span class="skill-pill">Pandas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAURAV KUMAR -->
+      <div class="team-card">
+        <div class="team-avatar avatar-3">GK</div>
+        <div class="team-info">
+          <div class="team-name">Gaurav Kumar</div>
+          <div class="team-role">Frontend Developer</div>
+          <div class="team-skills">
+            <span class="skill-pill">UI Development</span>
+            <span class="skill-pill">Flask Templates</span>
+            <span class="skill-pill">Dashboard UX</span>
+            <span class="skill-pill">Bootstrap</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NITIN SAINI -->
+      <div class="team-card">
+        <div class="team-avatar avatar-4">NS</div>
+        <div class="team-info">
+          <div class="team-name">Nitin Saini</div>
+          <div class="team-role">UI Designer & Visualization</div>
+          <div class="team-skills">
+            <span class="skill-pill">Chart.js</span>
+            <span class="skill-pill">Data Visualization</span>
+            <span class="skill-pill">UI Themes</span>
+            <span class="skill-pill">CSS Design</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-logo">Senti<span>lytics</span></div>
+    <div class="footer-copy">© 2025 Sentilytics · Built with ❤️ by Team Sentilytics · BTech Final Year Project</div>
+  </footer>
+
+</main>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById('themeIcon');
+    if (html.getAttribute('data-theme') === 'dark') {
+      html.setAttribute('data-theme', 'light');
+      icon.className = 'bi bi-sun-fill';
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      icon.className = 'bi bi-moon-stars-fill';
+    }
+  }
+</script>
+</body>
+</html>

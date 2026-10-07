@@ -1,0 +1,90 @@
+# ──────────────────────────────────────────────
+# Senti-Lytics Configuration Template
+# ──────────────────────────────────────────────
+# Copy this file to config.yaml and fill in your values:
+#   cp config_template.yaml config.yaml
+#
+# Environment variables override these values.
+# See .env.example for the env-var equivalents.
+# ──────────────────────────────────────────────
+
+api_keys:
+  # Your NewsAPI key (https://newsapi.org/register)
+  # Override with env var: NEWSAPI_KEY
+  newsapi: "YOUR_NEWSAPI_KEY_HERE"
+
+model:
+  # Path to the fine-tuned transformer model directory
+  # Override with env var: MODEL_PATH
+  path: "models/transformer_model/best_model"
+  
+  # Set to true to allow fallback to ProsusAI/finbert from HuggingFace Hub
+  # when no local model is found
+  allow_hub_fallback: true
+
+pipeline:
+  # Number of hours between automatic news refreshes
+  refresh_hours: 2
+  
+  # Number of articles to fetch per company per refresh
+  articles_per_company: 5
+  
+  # Percentage change threshold below which price moves are considered "flat"
+  flat_threshold_pct: 0.5
+  
+  # Hours after article publish time to measure price reaction
+  price_window_hours: 4
+
+companies:
+  - name: "Apple"
+    symbol: "AAPL"
+    query: '"Apple" AND (stock OR shares OR earnings OR AAPL)'
+    etf: "XLK"
+  - name: "Tesla"
+    symbol: "TSLA"
+    query: '"Tesla" AND (stock OR shares OR earnings OR TSLA)'
+    etf: "CARZ"
+  - name: "Amazon"
+    symbol: "AMZN"
+    query: '"Amazon" AND (stock OR shares OR earnings OR AMZN)'
+    etf: "XLY"
+  - name: "Google"
+    symbol: "GOOGL"
+    query: '"Alphabet" OR "Google" AND (stock OR shares OR earnings OR GOOGL)'
+    etf: "XLC"
+  - name: "Microsoft"
+    symbol: "MSFT"
+    query: '"Microsoft" AND (stock OR shares OR earnings OR MSFT)'
+    etf: "XLK"
+  - name: "Meta"
+    symbol: "META"
+    query: '"Meta Platforms" AND (stock OR shares OR earnings OR META)'
+    etf: "XLC"
+  - name: "NVIDIA"
+    symbol: "NVDA"
+    query: '"NVIDIA" AND (stock OR shares OR earnings OR NVDA)'
+    etf: "SMH"
+  - name: "Reliance"
+    symbol: "RELIANCE.NS"
+    query: '"Reliance Industries" AND (stock OR shares OR earnings)'
+    etf: "INDA"
+  - name: "HDFC Bank"
+    symbol: "HDFCBANK.NS"
+    query: '"HDFC Bank" AND (stock OR shares OR earnings)'
+    etf: "INDA"
+  - name: "Tata Motors"
+    symbol: "TATAMOTORS.NS"
+    query: '"Tata Motors" AND (stock OR shares OR earnings)'
+    etf: "INDA"
+
+heuristics:
+  # These are OPTIONAL accuracy boosters, disabled by default for honesty.
+  # Enable only after evaluating their impact on your test set.
+  neutral_floor_enabled: false
+  neutral_floor_threshold: 0.70
+  vader_assist_enabled: false
+
+demo:
+  # Set to true to use synthetic demo data instead of live API calls
+  # Override with env var: DEMO_MODE=true
+  enabled: false

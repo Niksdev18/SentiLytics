@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-01-01T00:00:00.000Z" agent="draw.io">
+  <diagram name="Flowchart">
+    <mxGraphModel dx="1166" dy="806" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Start oval -->
+        <mxCell id="start" value="Start" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DCE6F1;strokeColor=#000000;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- A -->
+        <mxCell id="A" value="A) Dataset Collection&#10;and Preprocessing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9EC9E8;strokeColor=#1F497D;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="100" width="300" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- B -->
+        <mxCell id="B" value="B) Feature Extraction&#10;TF-IDF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9EC9E8;strokeColor=#1F497D;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="240" width="300" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- C -->
+        <mxCell id="C" value="C) Models Used" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFA3EA;strokeColor=#6B2E8E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="100" width="300" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- D (Experimental Setup) -->
+        <mxCell id="D" value="D) Experimental Setup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9EE8E0;strokeColor=#0F6666;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="340" width="300" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- E (Deployment) -->
+        <mxCell id="E" value="E) Deployment&#10;Top news fetch & visualizations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3EC7C7;strokeColor=#0B6B6B;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="500" width="300" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- End oval -->
+        <mxCell id="end" value="End" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="640" y="520" width="80" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors -->
+        <!-- Start -> A -->
+        <mxCell id="edge_start_A" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#000000;" edge="1" parent="1" source="start" target="A">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- A -> B -->
+        <mxCell id="edge_A_B" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#000000;" edge="1" parent="1" source="A" target="B">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- B -> C -->
+        <mxCell id="edge_B_C" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#000000;" edge="1" parent="1" source="B" target="C">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- C -> D -->
+        <mxCell id="edge_C_D" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#000000;" edge="1" parent="1" source="C" target="D">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- D -> E -->
+        <mxCell id="edge_D_E" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#000000;" edge="1" parent="1" source="D" target="E">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- E -> End -->
+        <mxCell id="edge_E_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#000000;" edge="1" parent="1" source="E" target="end">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

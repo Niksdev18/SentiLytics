@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentilytics — AI Financial Sentiment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #141c2e;
+      --bg-card-hover: #1a2440;
+      --border: rgba(99,179,237,0.12);
+      --accent-blue: #63b3ed;
+      --accent-green: #68d391;
+      --accent-red: #fc8181;
+      --accent-yellow: #f6e05e;
+      --accent-purple: #b794f4;
+      --text-primary: #e2e8f0;
+      --text-secondary: #718096;
+      --text-muted: #4a5568;
+      --sidebar-width: 240px;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f0f4f8;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f7fafc;
+      --border: rgba(0,0,0,0.08);
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #a0aec0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      padding: 0 8px;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--accent-blue); }
+
+    .nav-section {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-muted); padding: 0 8px;
+      margin-bottom: 8px; margin-top: 16px;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.2s; margin-bottom: 2px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: var(--bg-card); color: var(--accent-blue);
+    }
+
+    .nav-item.active { border-left: 3px solid var(--accent-blue); }
+    .nav-item i { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto; padding: 12px;
+      border-radius: 10px; background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+
+    .model-badge { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--accent-green); display: block; }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-width); min-height: 100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .theme-toggle {
+      width: 36px; height: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary);
+      transition: all 0.2s; font-size: 16px;
+    }
+    .theme-toggle:hover { color: var(--accent-yellow); border-color: var(--accent-yellow); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 80px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(99,179,237,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent-blue);
+      background: rgba(99,179,237,0.1);
+      border: 1px solid rgba(99,179,237,0.2);
+      padding: 6px 14px; border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 52px; font-weight: 700;
+      line-height: 1.1; letter-spacing: -1.5px;
+      margin-bottom: 24px;
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 17px; line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 36px; max-width: 480px;
+    }
+
+    .hero-cta {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+
+    .btn-primary-hero {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white; text-decoration: none;
+      border-radius: 12px; font-weight: 600; font-size: 15px;
+      transition: all 0.2s; font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-primary-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99,179,237,0.35);
+      color: white;
+    }
+
+    .btn-outline-hero {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary); text-decoration: none;
+      border-radius: 12px; font-weight: 600; font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .btn-outline-hero:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    /* Hero visual */
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+    }
+
+    .hero-chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%; max-width: 420px;
+      animation: float 4s ease-in-out infinite;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .hcc-title {
+      font-size: 12px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .hcc-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hcc-row:last-child { border-bottom: none; }
+
+    .hcc-company { font-size: 14px; font-weight: 600; }
+    .hcc-symbol { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); }
+
+    .hcc-badge {
+      font-size: 11px; font-weight: 700; padding: 4px 10px;
+      border-radius: 8px; letter-spacing: 0.5px;
+    }
+
+    .hcc-pos { background: rgba(104,211,145,0.15); color: var(--accent-green); }
+    .hcc-neg { background: rgba(252,129,129,0.15); color: var(--accent-red); }
+    .hcc-neu { background: rgba(160,174,192,0.15); color: var(--text-secondary); }
+
+    .hcc-change { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
+    .up { color: var(--accent-green); }
+    .down { color: var(--accent-red); }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item {
+      background: var(--bg-secondary);
+      padding: 28px 32px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 36px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-blue);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 13px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .section {
+      padding: 80px 60px;
+    }
+
+    .section-header {
+      text-align: center; margin-bottom: 56px;
+    }
+
+    .section-eyebrow {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--accent-blue); margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 36px; font-weight: 700;
+      letter-spacing: -1px; margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 16px; color: var(--text-secondary);
+      max-width: 500px; margin: 0 auto; line-height: 1.6;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: all 0.25s;
+      position: relative;
+    }
+
+    .step-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .step-num {
+      font-size: 11px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-blue);
+      background: rgba(99,179,237,0.1);
+      border: 1px solid rgba(99,179,237,0.2);
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .step-icon { font-size: 28px; margin-bottom: 14px; }
+    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── MODEL METRICS ── */
+    .metrics-section {
+      padding: 80px 60px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .metric-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 4px 20px rgba(99,179,237,0.15);
+    }
+
+    .metric-model {
+      font-size: 13px; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 8px;
+    }
+
+    .metric-acc {
+      font-size: 28px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 4px;
+    }
+
+    .metric-best { color: var(--accent-green); }
+    .metric-good { color: var(--accent-blue); }
+    .metric-ok   { color: var(--accent-yellow); }
+    .metric-label { font-size: 11px; color: var(--text-muted); }
+
+    /* ── NEWS PREVIEW ── */
+    .news-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .news-prev-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .news-prev-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-3px);
+    }
+
+    .news-prev-source {
+      font-size: 11px; color: var(--accent-blue);
+      font-weight: 600; letter-spacing: 0.5px;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+
+    .news-prev-title {
+      font-size: 14px; font-weight: 600;
+      line-height: 1.5; color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 60px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .footer-logo { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .footer-logo span { color: var(--accent-blue); }
+    .footer-copy { font-size: 13px; color: var(--text-muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; padding: 16px 8px; }
+      .sidebar-logo .logo-text, .nav-item span, .nav-section, .sidebar-footer { display: none; }
+      .nav-item { justify-content: center; }
+      .main { margin-left: 60px; }
+      .hero { grid-template-columns: 1fr; padding: 40px 24px; gap: 40px; }
+      .hero-title { font-size: 36px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .section { padding: 60px 24px; }
+      .news-preview-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up:nth-child(1) { animation-delay: 0.1s; }
+    .fade-up:nth-child(2) { animation-delay: 0.2s; }
+    .fade-up:nth-child(3) { animation-delay: 0.3s; }
+    .fade-up:nth-child(4) { animation-delay: 0.4s; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">📊</div>
+    <div class="logo-text">Senti<span>lytics</span></div>
+  </div>
+
+  <div class="nav-section">Navigation</div>
+  <a href="/" class="nav-item active"><i class="bi bi-house-door"></i> <span>Home</span></a>
+  <a href="/dashboard" class="nav-item"><i class="bi bi-bar-chart-line"></i> <span>Dashboard</span></a>
+  <a href="/about" class="nav-item"><i class="bi bi-info-circle"></i> <span>About</span></a>
+
+  <div class="nav-section">Model</div>
+  <a href="#" class="nav-item"><i class="bi bi-cpu"></i> <span>FinBERT</span></a>
+  <a href="#" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Metrics</span></a>
+
+  <div class="sidebar-footer">
+    <span class="model-badge">● FinBERT Active</span>
+    <small style="color: var(--text-muted); font-size: 11px;">Accuracy: 92.14%</small>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div style="font-size: 13px; color: var(--text-muted);">
+      <span style="color: var(--accent-green); font-size: 8px;">●</span>&nbsp;
+      Real-time financial sentiment analysis powered by FinBERT
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="/dashboard" style="font-size: 13px; color: var(--accent-blue); text-decoration: none; font-weight: 600;">
+        <i class="bi bi-bar-chart-line"></i> Open Dashboard →
+      </a>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow">
+        <i class="bi bi-stars"></i> AI-Powered · Real-Time · FinBERT
+      </div>
+      <h1 class="hero-title">
+        Financial News<br>
+        <span class="highlight">Sentiment Analysis</span><br>
+        That Actually Works
+      </h1>
+      <p class="hero-desc">
+        Sentilytics uses FinBERT — a transformer model fine-tuned on financial text —
+        to analyze real-time market news, detect sentiment, and generate actionable
+        trading signals with 90% accuracy.
+      </p>
+      <div class="hero-cta">
+        <a href="/dashboard" class="btn-primary-hero">
+          <i class="bi bi-bar-chart-line"></i> Open Dashboard
+        </a>
+        <a href="/about" class="btn-outline-hero">
+          <i class="bi bi-people"></i> Meet the Team
+        </a>
+      </div>
+    </div>
+
+    <!-- Live preview card -->
+    <div class="hero-visual">
+      <div class="hero-chart-card">
+        <div class="hcc-title">
+          <i class="bi bi-activity" style="color: var(--accent-green)"></i>
+          &nbsp;Live Sentiment Feed
+        </div>
+
+        <div class="hcc-row">
+          <div>
+            <div class="hcc-company">Apple Inc.</div>
+            <div class="hcc-symbol">AAPL · NASDAQ</div>
+          </div>
+          <span class="hcc-badge hcc-pos">Positive</span>
+          <span class="hcc-change up">▲ +2.3%</span>
+        </div>
+
+        <div class="hcc-row">
+          <div>
+            <div class="hcc-company">Tesla</div>
+            <div class="hcc-symbol">TSLA · NASDAQ</div>
+          </div>
+          <span class="hcc-badge hcc-neg">Negative</span>
+          <span class="hcc-change down">▼ -1.8%</span>
+        </div>
+
+        <div class="hcc-row">
+          <div>
+            <div class="hcc-company">NVIDIA</div>
+            <div class="hcc-symbol">NVDA · NASDAQ</div>
+          </div>
+          <span class="hcc-badge hcc-pos">Positive</span>
+          <span class="hcc-change up">▲ +4.1%</span>
+        </div>
+
+        <div class="hcc-row">
+          <div>
+            <div class="hcc-company">Microsoft</div>
+            <div class="hcc-symbol">MSFT · NASDAQ</div>
+          </div>
+          <span class="hcc-badge hcc-neu">Neutral</span>
+          <span class="hcc-change" style="color: var(--text-muted)">● +0.2%</span>
+        </div>
+
+        <div class="hcc-row">
+          <div>
+            <div class="hcc-company">Reliance</div>
+            <div class="hcc-symbol">RELIANCE.NS · NSE</div>
+          </div>
+          <span class="hcc-badge hcc-pos">Positive</span>
+          <span class="hcc-change up">▲ +1.5%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS BAR ── -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-number">92.14<span style="font-size: 20px">%</span></div>
+      <div class="stat-label">Model Accuracy</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">10</div>
+      <div class="stat-label">Companies Tracked</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">7</div>
+      <div class="stat-label">ML Models Compared</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">2h</div>
+      <div class="stat-label">Update Frequency</div>
+    </div>
+  </div>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-eyebrow">How It Works</div>
+      <h2 class="section-title">From News to Trading Signal</h2>
+      <p class="section-sub">Four steps from raw news article to an actionable market insight.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <div class="step-num">01</div>
+        <div class="step-icon">📡</div>
+        <div class="step-title">Fetch News</div>
+        <div class="step-desc">NewsAPI pulls the latest financial articles every 2 hours across 10 major companies.</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-num">02</div>
+        <div class="step-icon">🧠</div>
+        <div class="step-title">Analyze Sentiment</div>
+        <div class="step-desc">FinBERT + VADER hybrid analyzes each headline and classifies it as Positive, Negative, or Neutral.</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-num">03</div>
+        <div class="step-icon">📈</div>
+        <div class="step-title">Fetch Stock Data</div>
+        <div class="step-desc">yFinance pulls real-time price data to measure the market's actual reaction to the news.</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-num">04</div>
+        <div class="step-icon">💡</div>
+        <div class="step-title">Generate Signal</div>
+        <div class="step-desc">Smart logic combines sentiment + price movement to produce BUY / SELL / HOLD suggestions.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MODEL METRICS ── -->
+  <section class="metrics-section">
+    <div class="section-header">
+      <div class="section-eyebrow">Model Comparison</div>
+      <h2 class="section-title">Why FinBERT Wins</h2>
+      <p class="section-sub">We trained and benchmarked 7 models. FinBERT outperformed every baseline.</p>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-model">FinBERT (Transformer)</div>
+        <div class="metric-acc metric-best">92.14%</div>
+        <div class="metric-label">Best Model ★</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-model">Voting Ensemble</div>
+        <div class="metric-acc metric-good">86.71%</div>
+        <div class="metric-label">F1: 0.861</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-model">SVM</div>
+        <div class="metric-acc metric-good">86.40%</div>
+        <div class="metric-label">F1: 0.862</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-model">XGBoost</div>
+        <div class="metric-acc metric-good">86.10%</div>
+        <div class="metric-label">F1: 0.854</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-model">Stacking Ensemble</div>
+        <div class="metric-acc metric-good">86.40%</div>
+        <div class="metric-label">F1: 0.859</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-model">Logistic Regression</div>
+        <div class="metric-acc metric-ok">84.59%</div>
+        <div class="metric-label">F1: 0.842</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-model">Random Forest</div>
+        <div class="metric-acc metric-ok">83.08%</div>
+        <div class="metric-label">F1: 0.820</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LATEST NEWS PREVIEW ── -->
+  {% if news and news|length > 0 %}
+  <section class="section">
+    <div class="section-header">
+      <div class="section-eyebrow">Latest News</div>
+      <h2 class="section-title">What the Market Is Talking About</h2>
+    </div>
+
+    <div class="news-preview-grid">
+      {% for item in news[:6] %}
+      <div class="news-prev-card">
+        <div class="news-prev-source">{{ item.source or "News" }} · {{ item.company }}</div>
+        <div class="news-prev-title">{{ item.title }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-top: 32px;">
+      <a href="/dashboard" class="btn-primary-hero">
+        <i class="bi bi-bar-chart-line"></i> View Full Dashboard with Sentiment Analysis
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-logo">Senti<span>lytics</span></div>
+    <div class="footer-copy">© 2025 Sentilytics · Built with ❤️ by Team Sentilytics · BTech Final Year Project</div>
+  </footer>
+
+</main>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById('themeIcon');
+    if (html.getAttribute('data-theme') === 'dark') {
+      html.setAttribute('data-theme', 'light');
+      icon.className = 'bi bi-sun-fill';
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      icon.className = 'bi bi-moon-stars-fill';
+    }
+  }
+</script>
+</body>
+</html>

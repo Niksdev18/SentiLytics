@@ -1,0 +1,77 @@
+# ────────────────────────────
+# Python
+# ────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter Notebook
+notebook/.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# ────────────────────────────
+# Secrets & Config
+# ────────────────────────────
+config.yaml
+.env
+*.key
+*.pem
+
+# DO NOT ignore these (they are templates):
+# !config_template.yaml
+# !.env.example
+
+# ────────────────────────────
+# Data (generated / large)
+# ────────────────────────────
+data/raw/newsapi/
+data/raw/financial_phrasebank_clean.csv
+data/processed/
+# DO NOT ignore data/sample/ — it contains demo/reference data
+
+# ────────────────────────────
+# ML / Model files (large)
+# ────────────────────────────
+models/transformer_model/
+models/*.pkl
+# DO NOT ignore models/model_metrics.csv — it holds training results
+
+# ────────────────────────────
+# Logs
+# ────────────────────────────
+*.log
+logs/
+*.out
+*.err
+
+# ────────────────────────────
+# Flask / Web
+# ────────────────────────────
+src/api/instance/
+*.db
+*.sqlite3
+
+# ────────────────────────────
+# System / IDE
+# ────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tmp
+*.swp
+
+# ────────────────────────────
+# Legacy junk (already deleted, just in case)
+# ────────────────────────────
+Order it.py3
+a.ipynb
