@@ -140,6 +140,7 @@ def create_app(
             companies=state.results.get("companies", {}),
             source=state.results.get("source", "demo"),
             model_name=state.results.get("model_name", "FinBERT"),
+            model_metrics=_get_model_metrics(state.config),
             generated_at=state.results.get("generated_at"),
             last_error=state.last_error,
         )

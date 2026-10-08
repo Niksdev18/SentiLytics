@@ -505,8 +505,16 @@
   <a href="#" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Metrics</span></a>
 
   <div class="sidebar-footer">
-    <span class="model-badge">● FinBERT Active</span>
-    <small style="color: var(--text-muted); font-size: 11px;">Accuracy: 92.14%</small>
+    <span class="model-badge">● {{ model_name or 'FinBERT' }}</span>
+    <small style="color: var(--text-muted); font-size: 11px;">
+      {%- if model_metrics and model_metrics.accuracy is defined -%}
+        Accuracy: {{ "%.2f"|format(model_metrics.accuracy * 100) }}%
+      {%- elif model_metrics and model_metrics.status is defined -%}
+        {{ model_metrics.status }}
+      {%- else -%}
+        Accuracy: n/a
+      {%- endif -%}
+    </small>
   </div>
 </aside>
 
@@ -542,8 +550,8 @@
       </h1>
       <p class="hero-desc">
         Sentilytics uses FinBERT — a transformer model fine-tuned on financial text —
-        to analyze real-time market news, detect sentiment, and generate actionable
-        trading signals with 90% accuracy.
+        to analyze market news, detect sentiment, and generate actionable
+        trading signals. Signals are heuristic; see the About page for limitations.
       </p>
       <div class="hero-cta">
         <a href="/dashboard" class="btn-primary-hero">
@@ -614,15 +622,27 @@
   <!-- ── STATS BAR ── -->
   <div class="stats-bar">
     <div class="stat-item">
-      <div class="stat-number">92.14<span style="font-size: 20px">%</span></div>
+      <div class="stat-number" id="statAccuracy">
+        {%- if model_metrics and model_metrics.accuracy is defined -%}
+          {{ "%.1f"|format(model_metrics.accuracy * 100) }}<span style="font-size: 20px">%</span>
+        {%- else -%}
+          n/a
+        {%- endif -%}
+      </div>
       <div class="stat-label">Model Accuracy</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">10</div>
+      <div class="stat-number">{{ companies|length if companies else 10 }}</div>
       <div class="stat-label">Companies Tracked</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">7</div>
+      <div class="stat-number">
+        {%- if model_metrics and model_metrics.models is defined -%}
+          {{ model_metrics.models|length }}
+        {%- else -%}
+          7
+        {%- endif -%}
+      </div>
       <div class="stat-label">ML Models Compared</div>
     </div>
     <div class="stat-item">
@@ -676,41 +696,34 @@
     </div>
 
     <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-model">FinBERT (Transformer)</div>
-        <div class="metric-acc metric-best">92.14%</div>
-        <div class="metric-label">Best Model ★</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-model">Voting Ensemble</div>
-        <div class="metric-acc metric-good">86.71%</div>
-        <div class="metric-label">F1: 0.861</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-model">SVM</div>
-        <div class="metric-acc metric-good">86.40%</div>
-        <div class="metric-label">F1: 0.862</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-model">XGBoost</div>
-        <div class="metric-acc metric-good">86.10%</div>
-        <div class="metric-label">F1: 0.854</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-model">Stacking Ensemble</div>
-        <div class="metric-acc metric-good">86.40%</div>
-        <div class="metric-label">F1: 0.859</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-model">Logistic Regression</div>
-        <div class="metric-acc metric-ok">84.59%</div>
-        <div class="metric-label">F1: 0.842</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-model">Random Forest</div>
-        <div class="metric-acc metric-ok">83.08%</div>
-        <div class="metric-label">F1: 0.820</div>
-      </div>
+      {%- if model_metrics and model_metrics.models is defined and model_metrics.models|length > 0 -%}
+        {%- set best_acc = model_metrics.models | map(attribute='accuracy') | max -%}
+        {%- for m in model_metrics.models | sort(attribute='accuracy', reverse=True) -%}
+          {%- set acc_val = m.accuracy -%}
+          {%- if acc_val > 1 %}{% set pct = "%.2f"|format(acc_val) %}{% else %}{% set pct = "%.2f"|format(acc_val * 100) %}{% endif -%}
+        <div class="metric-card">
+          <div class="metric-model">{{ m.model_name or m.get('model', m.get('Model', 'Unknown')) }}</div>
+          <div class="metric-acc {% if acc_val == best_acc %}metric-best{% elif acc_val >= (best_acc * 0.98 if best_acc <= 1 else best_acc * 0.98) %}metric-good{% else %}metric-ok{% endif %}">
+            {{ pct }}%</div>
+          <div class="metric-label">{% if acc_val == best_acc %}Best Model ★{% else %}F1: {{ "%.3f"|format(m.get('f1_macro', m.get('macro_f1', 0))) }}{% endif %}</div>
+        </div>
+        {%- endfor -%}
+      {%- elif model_metrics and model_metrics.accuracy is defined -%}
+        <div class="metric-card">
+          <div class="metric-model">{{ model_name or 'FinBERT' }}</div>
+          <div class="metric-acc metric-best">{{ "%.2f"|format(model_metrics.accuracy * 100) }}%</div>
+          <div class="metric-label">Best Model ★</div>
+        </div>
+        <div class="metric-card" style="grid-column: span 3; text-align:center; color: var(--text-muted); font-size: 13px; padding: 32px;">
+          Run <code style="color:var(--accent-blue)">python -m src.models.baseline</code> to populate the full comparison table.
+        </div>
+      {%- else -%}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-muted);">
+          <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
+          <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Model metrics not available</div>
+          <div style="font-size: 13px;">Run <code style="color:var(--accent-blue)">python -m src.models.baseline</code> then <code style="color:var(--accent-blue)">python -m src.models.transformer</code> to generate metrics.</div>
+        </div>
+      {%- endif -%}
     </div>
   </section>
 

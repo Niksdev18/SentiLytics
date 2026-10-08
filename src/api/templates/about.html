@@ -381,8 +381,16 @@
   <a href="#" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Metrics</span></a>
 
   <div class="sidebar-footer">
-    <span class="model-badge">● FinBERT Active</span>
-    <small style="color: var(--text-muted); font-size: 11px;">Accuracy: 92.14%</small>
+    <span class="model-badge">● {{ model_name or 'FinBERT' }}</span>
+    <small style="color: var(--text-muted); font-size: 11px;">
+      {%- if model_metrics and model_metrics.accuracy is defined -%}
+        Accuracy: {{ "%.2f"|format(model_metrics.accuracy * 100) }}%
+      {%- elif model_metrics and model_metrics.status is defined -%}
+        {{ model_metrics.status }}
+      {%- else -%}
+        Accuracy: n/a
+      {%- endif -%}
+    </small>
   </div>
 </aside>
 
@@ -415,7 +423,14 @@
     <div class="overview-card">
       <div class="ov-icon">🧠</div>
       <div class="ov-title">FinBERT Transformer</div>
-      <div class="ov-desc">Fine-tuned on financial tone data with 90.03% test accuracy. Outperforms every classical ML baseline by ~4%.</div>
+      <div class="ov-desc">
+        {%- if model_metrics and model_metrics.accuracy is defined -%}
+          Fine-tuned on financial tone data with {{ "%.2f"|format(model_metrics.accuracy * 100) }}% test accuracy.
+        {%- else -%}
+          Fine-tuned on financial tone data. Run training to see test accuracy.
+        {%- endif -%}
+        Sentiment direction is a heuristic metric — see <a href="/about#limitations" style="color:var(--accent-blue)">known limitations</a>.
+      </div>
     </div>
     <div class="overview-card">
       <div class="ov-icon">📊</div>

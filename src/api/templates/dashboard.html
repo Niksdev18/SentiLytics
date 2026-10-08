@@ -147,8 +147,16 @@ body{background:var(--bg);color:var(--t1);font-family:'Space Grotesk',sans-serif
   <a href="#" class="nav-a"><i class="bi bi-cpu"></i><span>FinBERT</span></a>
   <a href="#" class="nav-a"><i class="bi bi-graph-up-arrow"></i><span>Metrics</span></a>
   <div class="sb-foot">
-    <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#68d391;display:block;">&#9679; FinBERT Active</span>
-    <small style="color:#4a5568;font-size:11px;">Accuracy: 90.03</small>
+    <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#68d391;display:block;">&#9679; {{ model_name or 'FinBERT' }}</span>
+    <small style="color:#4a5568;font-size:11px;">
+      {%- if model_metrics and model_metrics.accuracy is defined -%}
+        Accuracy: {{ "%.2f"|format(model_metrics.accuracy * 100) }}%
+      {%- elif model_metrics and model_metrics.status is defined -%}
+        {{ model_metrics.status }}
+      {%- else -%}
+        Accuracy: n/a
+      {%- endif -%}
+    </small>
   </div>
 </aside>
 
@@ -220,8 +228,14 @@ body{background:var(--bg);color:var(--t1);font-family:'Space Grotesk',sans-serif
     </div>
     <div class="scard">
       <div class="scard-lbl">Active Model</div>
-      <div class="scard-val" style="font-size:16px;color:#b794f4">FinBERT</div>
-      <div class="scard-sub">92.14 test accuracy</div>
+      <div class="scard-val" style="font-size:16px;color:#b794f4">{{ model_name or 'FinBERT' }}</div>
+      <div class="scard-sub">
+        {%- if model_metrics and model_metrics.accuracy is defined -%}
+          {{ "%.2f"|format(model_metrics.accuracy * 100) }}% test accuracy
+        {%- else -%}
+          Test accuracy: n/a
+        {%- endif -%}
+      </div>
     </div>
   </div>
   {% endif %}
@@ -240,7 +254,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Space Grotesk',sans-serif
   <div class="cards" id="cardsGrid">
   {% for item in news %}
   {% set s_lower = item.overall_sentiment | lower %}
-  {% set change = item.change_24h | default(0) %}
+  {% set change = item.change_pct | default(item.change_24h) | default(0) %}
   <div class="ncard"
        data-s="{{ s_lower }}"
        data-co="{{ item.company | lower }}"
