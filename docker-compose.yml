@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  sentilytics:
+    build: .
+    container_name: sentilytics_app
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DEMO_MODE=${DEMO_MODE:-true}
+      - NEWSAPI_KEY=${NEWSAPI_KEY:-}
+      - START_SCHEDULER=true
+    volumes:
+      - ./data/processed:/app/data/processed
+    restart: unless-stopped
