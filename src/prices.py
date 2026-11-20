@@ -5,7 +5,7 @@ handling timezone conversions, weekend/market closures, intraday vs daily bars,
 and ETF proxy fallbacks.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from typing import Optional, Dict, Any, Tuple, List
 import logging
 import pandas as pd

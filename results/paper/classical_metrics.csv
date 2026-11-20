@@ -1,0 +1,5 @@
+model,model_key,accuracy,macro_precision,macro_recall,macro_f1,weighted_f1,train_seconds,infer_seconds_per_1k,model_size_kb
+Naive Bayes (TF-IDF),naive_bayes,0.835294,0.780086,0.794008,0.786608,0.836413,0.0018,0.00071,328.92
+Logistic Regression,logistic_regression,0.888235,0.876081,0.848977,0.861518,0.887474,0.1317,0.000922,164.95
+Linear SVM,svm,0.888235,0.878612,0.840999,0.858115,0.886696,0.0083,0.000758,164.82
+Random Forest,random_forest,0.820588,0.785643,0.744484,0.761529,0.814128,0.6096,0.180485,5786.53

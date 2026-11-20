@@ -5,7 +5,7 @@ Hierarchical loading: hardcoded defaults < config.yaml < environment variables.
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
 import logging
 import os
 import yaml
@@ -124,9 +124,16 @@ def load_config(config_path: Optional[Path] = None) -> AppConfig:
 
             # Heuristics
             if "heuristics" in data and isinstance(data["heuristics"], dict):
-                cfg.neutral_floor_enabled = bool(data["heuristics"].get("neutral_floor_enabled", cfg.neutral_floor_enabled))
-                cfg.neutral_floor_threshold = float(data["heuristics"].get("neutral_floor_threshold", cfg.neutral_floor_threshold))
-                cfg.vader_assist_enabled = bool(data["heuristics"].get("vader_assist_enabled", cfg.vader_assist_enabled))
+                heuristics = data["heuristics"]
+                cfg.neutral_floor_enabled = bool(
+                    heuristics.get("neutral_floor_enabled", cfg.neutral_floor_enabled)
+                )
+                cfg.neutral_floor_threshold = float(
+                    heuristics.get("neutral_floor_threshold", cfg.neutral_floor_threshold)
+                )
+                cfg.vader_assist_enabled = bool(
+                    heuristics.get("vader_assist_enabled", cfg.vader_assist_enabled)
+                )
 
             # Demo
             if "demo" in data and isinstance(data["demo"], dict):

@@ -10,7 +10,7 @@ Features:
 
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 import json
 import logging
 import re
@@ -86,7 +86,7 @@ def fetch_company_news(
 
     url = "https://newsapi.org/v2/everything"
     headers = {"X-Api-Key": api_key} if api_key else {}
-    params = {
+    params: Dict[str, Union[str, int]] = {
         "q": company.query,
         "language": "en",
         "sortBy": "publishedAt",

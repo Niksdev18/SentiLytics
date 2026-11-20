@@ -15,3 +15,4 @@ services:
         value: "true"
       - key: NEWSAPI_KEY
         sync: false
+

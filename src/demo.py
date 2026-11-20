@@ -22,7 +22,8 @@ DEMO_HEADLINE_TEMPLATES = [
     ("{name} trims revenue guidance amid softening enterprise hardware demand", "Negative", -3.10),
     ("{name} holds annual shareholder meeting; reiterates full-year fiscal targets", "Neutral", 0.15),
     ("{name} announces partnership with regional telecom providers", "Positive", -1.20),  # Delayed reaction / mismatch
-    ("{name} supplier halts production temporarily following factory audit", "Negative", 1.05),   # Delayed reaction / mismatch
+    # Delayed reaction / mismatch
+    ("{name} supplier halts production temporarily following factory audit", "Negative", 1.05),
 ]
 
 

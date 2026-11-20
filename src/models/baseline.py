@@ -6,7 +6,7 @@ Trains tuned classifiers and logs evaluation metrics to models/model_metrics.csv
 
 from collections import Counter
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import logging
 import joblib
 import pandas as pd
@@ -23,7 +23,7 @@ from xgboost import XGBClassifier
 logger = logging.getLogger(__name__)
 
 
-def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFrame:
+def train_baselines(data_dir: Optional[Path] = None, models_dir: Optional[Path] = None) -> pd.DataFrame:
     """Train all baseline classical models and save artifacts and metrics.
 
     Args:
@@ -42,14 +42,12 @@ def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFr
     models_dir.mkdir(parents=True, exist_ok=True)
 
     train_path = data_dir / "train.csv"
-    val_path = data_dir / "val.csv"
     test_path = data_dir / "test.csv"
 
     if not (train_path.exists() and test_path.exists()):
         raise FileNotFoundError(f"Processed datasets not found in {data_dir}. Run split_data.py first.")
 
     train_df = pd.read_csv(train_path).dropna(subset=["text_classic", "label"])
-    val_df = pd.read_csv(val_path).dropna(subset=["text_classic", "label"]) if val_path.exists() else None
     test_df = pd.read_csv(test_path).dropna(subset=["text_classic", "label"])
 
     X_train = train_df["text_classic"].astype(str)
@@ -63,7 +61,7 @@ def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFr
     # Encode labels
     le = LabelEncoder()
     y_train_enc = le.fit_transform(y_train)
-    y_test_enc = le.transform(y_test)
+    _ = le.transform(y_test)
     joblib.dump(le, models_dir / "baseline_label_encoder.pkl")
 
     # Feature extraction (TF-IDF & Count)
@@ -83,8 +81,13 @@ def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFr
     # Define base models
     base_models = {
         "LogisticRegression": LogisticRegression(max_iter=1500, C=1.5, class_weight="balanced", random_state=42),
-        "RandomForest": RandomForestClassifier(n_estimators=300, min_samples_leaf=2, class_weight="balanced", random_state=42),
-        "XGBoost": XGBClassifier(n_estimators=300, max_depth=6, learning_rate=0.1, subsample=0.8, colsample_bytree=0.8, eval_metric="mlogloss", random_state=42),
+        "RandomForest": RandomForestClassifier(
+            n_estimators=300, min_samples_leaf=2, class_weight="balanced", random_state=42
+        ),
+        "XGBoost": XGBClassifier(
+            n_estimators=300, max_depth=6, learning_rate=0.1,
+            subsample=0.8, colsample_bytree=0.8, eval_metric="mlogloss", random_state=42
+        ),
         "SVM": SVC(kernel="linear", C=2.0, probability=True, class_weight="balanced", random_state=42),
         "MNB": MultinomialNB(),
     }
@@ -128,7 +131,9 @@ def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFr
     y_pred_stack = stacking.predict(X_test_tfidf)
     y_pred_stack_labels = le.inverse_transform(y_pred_stack)
     acc_stack = accuracy_score(y_test, y_pred_stack_labels)
-    prec_s, rec_s, f1_s, _ = precision_recall_fscore_support(y_test, y_pred_stack_labels, average="weighted", zero_division=0)
+    prec_s, rec_s, f1_s, _ = precision_recall_fscore_support(
+        y_test, y_pred_stack_labels, average="weighted", zero_division=0
+    )
     metrics_list.append({
         "Model": "StackingEnsemble",
         "Accuracy": round(acc_stack, 4),
@@ -151,7 +156,9 @@ def train_baselines(data_dir: Path = None, models_dir: Path = None) -> pd.DataFr
     y_pred_vote = voting.predict(X_test_tfidf)
     y_pred_vote_labels = le.inverse_transform(y_pred_vote)
     acc_vote = accuracy_score(y_test, y_pred_vote_labels)
-    prec_v, rec_v, f1_v, _ = precision_recall_fscore_support(y_test, y_pred_vote_labels, average="weighted", zero_division=0)
+    prec_v, rec_v, f1_v, _ = precision_recall_fscore_support(
+        y_test, y_pred_vote_labels, average="weighted", zero_division=0
+    )
     metrics_list.append({
         "Model": "WeightedSoftVotingEnsemble",
         "Accuracy": round(acc_vote, 4),

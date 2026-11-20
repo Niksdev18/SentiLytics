@@ -61,7 +61,7 @@ def evaluate_test_set(
                 inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=128)
                 outputs = model(**inputs)
                 probs = torch.softmax(outputs.logits, dim=-1).squeeze(0)
-                pred_idx = torch.argmax(probs).item()
+                pred_idx = int(torch.argmax(probs).item())
                 pred_label = id2label.get(pred_idx, "neutral")
 
                 # Optional heuristic: neutral floor override
@@ -71,7 +71,7 @@ def evaluate_test_set(
                         # force highest non-neutral prob
                         probs_non_neu = probs.clone()
                         probs_non_neu[neu_idx[0]] = -1.0
-                        forced_idx = torch.argmax(probs_non_neu).item()
+                        forced_idx = int(torch.argmax(probs_non_neu).item())
                         pred_label = id2label.get(forced_idx, pred_label)
 
                 y_preds.append(pred_label)

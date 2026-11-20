@@ -1,0 +1,11 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# requirements-benchmark.txt
+# Extra packages needed ONLY for the paper benchmark pipeline.
+# These are NOT in requirements.txt because they are not required by the main app.
+#
+# Install: pip install -r requirements-benchmark.txt
+# (Run AFTER requirements.txt is already satisfied.)
+# ──────────────────────────────────────────────────────────────────────────────
+
+matplotlib>=3.7.0
+statsmodels>=0.14.0

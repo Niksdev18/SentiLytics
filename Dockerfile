@@ -28,3 +28,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 
 # Production WSGI launch with 1 worker to protect APScheduler and rate limits
 CMD ["sh", "-c", "gunicorn --workers 1 --bind 0.0.0.0:${PORT} --timeout 120 wsgi:app"]
+

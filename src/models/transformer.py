@@ -175,7 +175,10 @@ def train_transformer(
 
     # Evaluate on test set
     preds_output = trainer.predict(test_dataset)
-    y_pred = preds_output.predictions.argmax(-1)
+    raw_preds = preds_output.predictions
+    if isinstance(raw_preds, tuple):
+        raw_preds = raw_preds[0]
+    y_pred = raw_preds.argmax(-1)
 
     acc = accuracy_score(y_test_enc, y_pred)
     prec_w, rec_w, f1_w, _ = precision_recall_fscore_support(y_test_enc, y_pred, average="weighted", zero_division=0)

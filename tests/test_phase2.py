@@ -1,11 +1,9 @@
 """Comprehensive test suite for Phase 2: Backend Core."""
 
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
 import pandas as pd
-import pytest
 
-from src.config import AppConfig, CompanyConfig, load_config
+from src.config import AppConfig, CompanyConfig
 from src.demo import generate_demo_results
 from src.insight import generate_trading_suggestion, is_correct, aggregate_accuracy
 from src.news import strip_source_suffix
@@ -144,7 +142,8 @@ def test_etf_fallback_mechanism(monkeypatch):
                 if sym == "AAPL":
                     return pd.DataFrame()  # empty ticker
                 elif sym == "XLK":
-                    return pd.DataFrame({"Close": [200.0, 202.0]}, index=pd.date_range("2026-10-01", periods=2, freq="h"))
+                    idx = pd.date_range("2026-10-01", periods=2, freq="h")
+                    return pd.DataFrame({"Close": [200.0, 202.0]}, index=idx)
                 return pd.DataFrame()
         return Dummy()
 
@@ -202,6 +201,7 @@ def test_run_pipeline_end_to_end_with_stubs(tmp_path):
     # Stubbed sentiment engine
     class StubEngine:
         model_description = "Stubbed FinBERT"
+
         def predict_batch(self, texts):
             return [{
                 "label": "Positive",

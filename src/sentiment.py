@@ -11,7 +11,6 @@ Features:
 
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-import json
 import logging
 import torch
 
@@ -25,14 +24,14 @@ class SentimentEngine:
 
     def __init__(self, config: Optional[AppConfig] = None):
         self.config = config or AppConfig()
-        self.tokenizer = None
-        self.model = None
+        self.tokenizer: Optional[Any] = None
+        self.model: Optional[Any] = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.status: str = "uninitialized"  # 'ready', 'unavailable', 'uninitialized'
         self.model_description: str = "None"
         self.is_fine_tuned: bool = False
         self.id2label: Dict[int, str] = {0: "Negative", 1: "Neutral", 2: "Positive"}
-        self._vader_analyzer = None
+        self._vader_analyzer: Optional[Any] = None
 
     def _normalize_label(self, raw_label: Any) -> str:
         """Normalize label string to standard TitleCase."""
@@ -46,7 +45,10 @@ class SentimentEngine:
     def load(self) -> bool:
         """Load transformer model: local first, then Hub fallback if allowed."""
         root = Path(__file__).resolve().parent.parent
-        model_path = root / self.config.model_path if not Path(self.config.model_path).is_absolute() else Path(self.config.model_path)
+        if Path(self.config.model_path).is_absolute():
+            model_path = Path(self.config.model_path)
+        else:
+            model_path = root / self.config.model_path
 
         # 1. Try local fine-tuned model
         if model_path.exists() and (model_path / "config.json").exists():
@@ -132,7 +134,7 @@ class SentimentEngine:
         batch_size = 32
 
         for i in range(0, len(texts), batch_size):
-            chunk = texts[i : i + batch_size]
+            chunk = texts[i:i + batch_size]
             encoded = self.tokenizer(
                 chunk,
                 padding=True,

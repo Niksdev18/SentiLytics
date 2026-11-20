@@ -1,8 +1,6 @@
 """Tests for Phase 1: Training-side correctness."""
 
-from collections import Counter
 from pathlib import Path
-import pytest
 
 from src.preprocessing.prepare_dataset import parse_financial_phrasebank
 from src.preprocessing.preprocess import light_clean, classic_clean

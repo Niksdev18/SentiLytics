@@ -8,7 +8,6 @@ Features:
 """
 
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable, Tuple
 import json
 import logging
@@ -52,9 +51,14 @@ def run_pipeline(
         return results
 
     if news_fn is None:
-        news_fn = lambda comp, key, ps: fetch_company_news(comp, api_key=key, page_size=ps)
+        def _default_news_fn(comp: CompanyConfig, key: Optional[str], ps: int) -> List[Dict[str, Any]]:
+            return fetch_company_news(comp, api_key=key, page_size=ps)
+        news_fn = _default_news_fn
+
     if history_fn is None:
-        history_fn = lambda sym, etf: fetch_symbol_history(sym, proxy_etf=etf)
+        def _default_history_fn(sym: str, etf: str) -> Any:
+            return fetch_symbol_history(sym, proxy_etf=etf)
+        history_fn = _default_history_fn
 
     # 1. Fetch news articles across all companies
     all_articles: List[Dict[str, Any]] = []
