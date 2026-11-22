@@ -39,6 +39,8 @@ DEFAULT_COMPANIES = [
 class AppConfig:
     # API Keys
     newsapi_key: Optional[str] = None
+    tinyfish_api_key: Optional[str] = None
+    news_provider: str = "auto"
 
     # Model Settings
     model_path: str = "models/transformer_model/best_model"
@@ -94,6 +96,7 @@ def load_config(config_path: Optional[Path] = None) -> AppConfig:
             # API Keys
             if "api_keys" in data and isinstance(data["api_keys"], dict):
                 cfg.newsapi_key = data["api_keys"].get("newsapi")
+                cfg.tinyfish_api_key = data["api_keys"].get("tinyfish")
 
             # Model
             if "model" in data and isinstance(data["model"], dict):
@@ -106,6 +109,7 @@ def load_config(config_path: Optional[Path] = None) -> AppConfig:
                 cfg.articles_per_company = int(data["pipeline"].get("articles_per_company", cfg.articles_per_company))
                 cfg.flat_threshold_pct = float(data["pipeline"].get("flat_threshold_pct", cfg.flat_threshold_pct))
                 cfg.price_window_hours = int(data["pipeline"].get("price_window_hours", cfg.price_window_hours))
+                cfg.news_provider = str(data["pipeline"].get("news_provider", cfg.news_provider))
 
             # Companies
             if "companies" in data and isinstance(data["companies"], list):
@@ -143,6 +147,14 @@ def load_config(config_path: Optional[Path] = None) -> AppConfig:
             logger.warning("Failed to load config from %s: %s", config_path, e)
 
     # Environment variables override YAML and defaults
+    env_tinyfish = os.environ.get("TINYFISH_API_KEY")
+    if env_tinyfish:
+        cfg.tinyfish_api_key = env_tinyfish
+
+    env_provider = os.environ.get("NEWS_PROVIDER")
+    if env_provider:
+        cfg.news_provider = env_provider
+
     env_newsapi = os.environ.get("NEWSAPI_KEY")
     if env_newsapi:
         cfg.newsapi_key = env_newsapi

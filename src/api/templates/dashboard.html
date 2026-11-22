@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-  :root{--bg:#080d18;--bg2:#0f1623;--bg3:#131d30;--bg4:#182240;--border:rgba(99,179,237,0.10);--blue:#63b3ed;--green:#68d391;--red:#fc8181;--yellow:#f6e05e;--purple:#b794f4;--t1:#e2e8f0;--t2:#718096;--t3:#4a5568;--sw:240px;}
-[data-theme="light"]{--bg:#f0f4f8;--bg2:#fff;--bg3:#fff;--bg4:#f7fafc;--border:rgba(0,0,0,0.07);--t1:#1a202c;--t2:#4a5568;--t3:#a0aec0;}
+  :root{--bg:#06020e;--bg2:rgba(15,7,28,0.92);--bg3:rgba(24,11,46,0.92);--bg4:rgba(35,16,66,0.95);--border:rgba(168,85,247,0.22);--blue:#a855f7;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;--purple:#c084fc;--t1:#f8fafc;--t2:#cbd5e1;--t3:#94a3b8;--sw:240px;}
+[data-theme="light"]{--bg:#f8fafc;--bg2:#fff;--bg3:#f1f5f9;--bg4:#e2e8f0;--border:rgba(168,85,247,0.15);--t1:#0f172a;--t2:#334155;--t3:#64748b;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--t1);font-family:'Space Grotesk',sans-serif;transition:background .3s,color .3s;}
+body{background-color:var(--bg);background-image:radial-gradient(circle at 80% 10%, rgba(139,92,246,0.18) 0%, transparent 40%), linear-gradient(rgba(139,92,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px);background-size:100% 100%, 48px 48px, 48px 48px;color:var(--t1);font-family:'Space Grotesk',sans-serif;transition:background .3s,color .3s;}
 .sidebar{position:fixed;left:0;top:0;width:var(--sw);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px;z-index:100;}
 .logo-row{display:flex;align-items:center;gap:10px;margin-bottom:36px;padding:0 8px;}
 .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}

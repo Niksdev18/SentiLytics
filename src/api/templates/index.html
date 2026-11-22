@@ -1,777 +1,1522 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sentilytics — AI Financial Sentiment</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <title>Sentilytics — AI Market Sentiment & Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
     :root {
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #111827;
-      --bg-card: #141c2e;
-      --bg-card-hover: #1a2440;
-      --border: rgba(99,179,237,0.12);
-      --accent-blue: #63b3ed;
-      --accent-green: #68d391;
-      --accent-red: #fc8181;
-      --accent-yellow: #f6e05e;
-      --accent-purple: #b794f4;
-      --text-primary: #e2e8f0;
-      --text-secondary: #718096;
-      --text-muted: #4a5568;
-      --sidebar-width: 240px;
+      --bg-dark: #06020e;
+      --bg-card: rgba(18, 9, 34, 0.75);
+      --bg-card-hover: rgba(28, 14, 52, 0.85);
+      --purple-primary: #8b5cf6;
+      --purple-accent: #a855f7;
+      --purple-light: #c084fc;
+      --purple-glow: rgba(168, 85, 247, 0.35);
+      --purple-border: rgba(168, 85, 247, 0.22);
+      --purple-border-hover: rgba(192, 132, 252, 0.45);
+      --purple-btn: #7c3aed;
+      --purple-btn-hover: #9333ea;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --green-accent: #4ade80;
+      --red-accent: #f87171;
+      --yellow-accent: #fbbf24;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
-    [data-theme="light"] {
-      --bg-primary: #f0f4f8;
-      --bg-secondary: #ffffff;
-      --bg-card: #ffffff;
-      --bg-card-hover: #f7fafc;
-      --border: rgba(0,0,0,0.08);
-      --text-primary: #1a202c;
-      --text-secondary: #4a5568;
-      --text-muted: #a0aec0;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      font-family: 'Space Grotesk', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 80% 12%, rgba(139, 92, 246, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 20% 45%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.14) 0%, transparent 55%),
+        linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      color: var(--text-main);
+      font-family: var(--font-sans);
       min-height: 100vh;
-      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+      line-height: 1.5;
     }
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      position: fixed;
-      left: 0; top: 0;
-      width: var(--sidebar-width);
-      height: 100vh;
-      background: var(--bg-secondary);
-      border-right: 1px solid var(--border);
+    /* ── FLOATING PILL NAVBAR ── */
+    .nav-wrapper {
+      position: sticky;
+      top: 18px;
+      z-index: 1000;
       display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      z-index: 100;
+      justify-content: center;
+      padding: 0 20px;
     }
 
-    .sidebar-logo {
+    .pill-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      background: rgba(15, 7, 28, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--purple-border);
+      border-radius: 9999px;
+      padding: 8px 12px 8px 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(124, 58, 237, 0.15);
+      max-width: 900px;
+      width: 100%;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .pill-nav:hover {
+      border-color: var(--purple-border-hover);
+      box-shadow: 0 14px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(168, 85, 247, 0.25);
+    }
+
+    .nav-brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 36px;
-      padding: 0 8px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
     }
 
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-
-    .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-    .logo-text span { color: var(--accent-blue); }
-
-    .nav-section {
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--text-muted); padding: 0 8px;
-      margin-bottom: 8px; margin-top: 16px;
-    }
-
-    .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: 10px;
-      color: var(--text-secondary); text-decoration: none;
-      font-size: 14px; font-weight: 500;
-      transition: all 0.2s; margin-bottom: 2px;
-    }
-
-    .nav-item:hover, .nav-item.active {
-      background: var(--bg-card); color: var(--accent-blue);
-    }
-
-    .nav-item.active { border-left: 3px solid var(--accent-blue); }
-    .nav-item i { font-size: 16px; width: 20px; text-align: center; }
-
-    .sidebar-footer {
-      margin-top: auto; padding: 12px;
-      border-radius: 10px; background: var(--bg-card);
-      border: 1px solid var(--border);
-    }
-
-    .model-badge { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--accent-green); display: block; }
-
-    /* ── MAIN ── */
-    .main { margin-left: var(--sidebar-width); min-height: 100vh; }
-
-    /* ── TOPBAR ── */
-    .topbar {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-secondary);
-    }
-
-    .theme-toggle {
-      width: 36px; height: 36px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-secondary);
-      transition: all 0.2s; font-size: 16px;
-    }
-    .theme-toggle:hover { color: var(--accent-yellow); border-color: var(--accent-yellow); }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 80px 60px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .nav-logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      border-radius: 8px;
+      display: flex;
       align-items: center;
-      gap: 60px;
+      justify-content: center;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+    }
+
+    .btn-nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: 9999px;
+      box-shadow: 0 0 18px rgba(139, 92, 246, 0.45);
+      transition: all 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-nav-cta:hover {
+      background: linear-gradient(135deg, #8b5cf6, #c084fc);
+      box-shadow: 0 0 26px rgba(168, 85, 247, 0.65);
+      transform: translateY(-1px);
+      color: #fff;
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── HERO SECTION ── */
+    .hero {
       position: relative;
-      overflow: hidden;
+      padding: 70px 0 60px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 40px;
+      min-height: 520px;
     }
 
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -100px; right: -100px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(99,179,237,0.08) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--accent-blue);
-      background: rgba(99,179,237,0.1);
-      border: 1px solid rgba(99,179,237,0.2);
-      padding: 6px 14px; border-radius: 20px;
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124, 58, 237, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple-light);
       margin-bottom: 24px;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #a855f7;
+      box-shadow: 0 0 8px #a855f7;
+      animation: pulseGlow 2s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
     }
 
     .hero-title {
-      font-size: 52px; font-weight: 700;
-      line-height: 1.1; letter-spacing: -1.5px;
-      margin-bottom: 24px;
-    }
-
-    .hero-title .highlight {
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-desc {
-      font-size: 17px; line-height: 1.7;
-      color: var(--text-secondary);
-      margin-bottom: 36px; max-width: 480px;
-    }
-
-    .hero-cta {
-      display: flex; gap: 12px; flex-wrap: wrap;
-    }
-
-    .btn-primary-hero {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 14px 28px;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      color: white; text-decoration: none;
-      border-radius: 12px; font-weight: 600; font-size: 15px;
-      transition: all 0.2s; font-family: 'Space Grotesk', sans-serif;
-    }
-
-    .btn-primary-hero:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(99,179,237,0.35);
-      color: white;
-    }
-
-    .btn-outline-hero {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 14px 28px;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-secondary); text-decoration: none;
-      border-radius: 12px; font-weight: 600; font-size: 15px;
-      transition: all 0.2s;
-    }
-
-    .btn-outline-hero:hover {
-      border-color: var(--accent-blue);
-      color: var(--accent-blue);
-    }
-
-    /* Hero visual */
-    .hero-visual {
-      display: flex; justify-content: center; align-items: center;
-    }
-
-    .hero-chart-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px;
-      width: 100%; max-width: 420px;
-      animation: float 4s ease-in-out infinite;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
-
-    .hcc-title {
-      font-size: 12px; font-weight: 600; letter-spacing: 1px;
-      text-transform: uppercase; color: var(--text-muted);
+      font-size: 58px;
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -1.8px;
+      color: #ffffff;
       margin-bottom: 20px;
     }
 
-    .hcc-row {
-      display: flex; justify-content: space-between;
-      align-items: center; padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+    .hero-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 34px;
+      max-width: 520px;
     }
 
-    .hcc-row:last-child { border-bottom: none; }
-
-    .hcc-company { font-size: 14px; font-weight: 600; }
-    .hcc-symbol { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); }
-
-    .hcc-badge {
-      font-size: 11px; font-weight: 700; padding: 4px 10px;
-      border-radius: 8px; letter-spacing: 0.5px;
+    /* Hero Input Form */
+    .hero-form {
+      display: flex;
+      align-items: center;
+      background: rgba(22, 11, 44, 0.8);
+      border: 1px solid var(--purple-border);
+      border-radius: 9999px;
+      padding: 6px 8px 6px 18px;
+      max-width: 480px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 34px;
     }
 
-    .hcc-pos { background: rgba(104,211,145,0.15); color: var(--accent-green); }
-    .hcc-neg { background: rgba(252,129,129,0.15); color: var(--accent-red); }
-    .hcc-neu { background: rgba(160,174,192,0.15); color: var(--text-secondary); }
-
-    .hcc-change { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; }
-    .up { color: var(--accent-green); }
-    .down { color: var(--accent-red); }
-
-    /* ── STATS BAR ── */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+    .hero-form:focus-within {
+      border-color: var(--purple-accent);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
     }
 
-    .stat-item {
-      background: var(--bg-secondary);
-      padding: 28px 32px;
-      text-align: center;
+    .hero-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      flex: 1;
+      padding: 6px 0;
     }
 
-    .stat-number {
-      font-size: 36px; font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--accent-blue);
-      line-height: 1;
-      margin-bottom: 6px;
+    .hero-input::placeholder {
+      color: var(--text-dim);
     }
 
-    .stat-label {
-      font-size: 13px; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.8px;
+    .hero-btn {
+      background: #ffffff;
+      color: #0c051a;
+      border: none;
+      outline: none;
+      border-radius: 9999px;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+      white-space: nowrap;
     }
 
-    /* ── HOW IT WORKS ── */
-    .section {
-      padding: 80px 60px;
+    .hero-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.25);
     }
 
-    .section-header {
-      text-align: center; margin-bottom: 56px;
-    }
-
-    .section-eyebrow {
-      font-size: 12px; font-weight: 600;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--accent-blue); margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: 36px; font-weight: 700;
-      letter-spacing: -1px; margin-bottom: 14px;
-    }
-
-    .section-sub {
-      font-size: 16px; color: var(--text-secondary);
-      max-width: 500px; margin: 0 auto; line-height: 1.6;
-    }
-
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+    /* Trust Proof Bar */
+    .hero-proof {
+      display: flex;
+      align-items: center;
       gap: 20px;
+      font-size: 12px;
+      color: var(--text-dim);
+      flex-wrap: wrap;
     }
 
-    .step-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 24px;
-      transition: all 0.25s;
+    .proof-label {
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+
+    .proof-logos {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .proof-item {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbd5e1;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    .proof-item:hover {
+      opacity: 1;
+      color: #fff;
+    }
+
+    /* ── 3D FLOATING ISOMETRIC CUBES VISUAL ── */
+    .hero-3d-scene {
+      position: relative;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+    }
+
+    .ambient-glow-cube {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(124, 58, 237, 0.15) 50%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+      animation: floatGlow 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: scale(0.9) translate(-10px, 10px); }
+      100% { transform: scale(1.1) translate(15px, -15px); }
+    }
+
+    /* Render isometric cubes using SVG & CSS transforms */
+    .isometric-cube-group {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cube-item {
+      position: absolute;
+      transition: transform 0.4s ease;
+      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.8));
+    }
+
+    .cube-1 {
+      top: 40px; right: 80px; width: 110px;
+      animation: floatCube1 7s ease-in-out infinite;
+    }
+
+    .cube-2 {
+      top: 15px; right: 230px; width: 85px;
+      animation: floatCube2 8s ease-in-out infinite 0.5s;
+    }
+
+    .cube-3 {
+      top: 150px; right: 190px; width: 125px;
+      animation: floatCube3 6.5s ease-in-out infinite 1s;
+    }
+
+    .cube-4 {
+      top: 240px; right: 60px; width: 95px;
+      animation: floatCube1 7.5s ease-in-out infinite 1.5s;
+    }
+
+    .cube-5 {
+      top: 290px; right: 220px; width: 130px;
+      animation: floatCube2 6s ease-in-out infinite 2s;
+    }
+
+    .cube-6 {
+      bottom: 20px; right: 90px; width: 100px;
+      animation: floatCube3 8.5s ease-in-out infinite 0.8s;
+    }
+
+    @keyframes floatCube1 {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-14px) rotate(1deg); }
+    }
+    @keyframes floatCube2 {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(-1.5deg); }
+    }
+    @keyframes floatCube3 {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    /* ── CENTER SECTION: EVERYTHING YOU NEED ── */
+    .section-centered {
+      text-align: center;
+      padding: 90px 0 40px;
+    }
+
+    .centered-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(124, 58, 237, 0.14);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--purple-light);
+      margin-bottom: 22px;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.25);
+    }
+
+    .centered-title {
+      font-size: 38px;
+      font-weight: 700;
+      color: #fff;
+      max-width: 680px;
+      margin: 0 auto 16px;
+      line-height: 1.25;
+      letter-spacing: -0.8px;
+    }
+
+    /* ── FEATURED MAC-OS DASHBOARD WINDOW MOCKUP ── */
+    .window-container {
+      max-width: 1060px;
+      margin: 30px auto 80px;
       position: relative;
     }
 
-    .step-card:hover {
-      border-color: var(--accent-blue);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    .window-ambient-backlight {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      height: 75%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(91, 33, 182, 0.1) 60%, transparent 80%);
+      filter: blur(60px);
+      z-index: 1;
+      pointer-events: none;
     }
 
-    .step-num {
-      font-size: 11px; font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--accent-blue);
-      background: rgba(99,179,237,0.1);
-      border: 1px solid rgba(99,179,237,0.2);
-      width: 28px; height: 28px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
+    .mockup-window {
+      position: relative;
+      z-index: 2;
+      background: #090314;
+      border: 1px solid rgba(168, 85, 247, 0.28);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.8), 0 0 35px rgba(124, 58, 237, 0.25);
     }
 
-    .step-icon { font-size: 28px; margin-bottom: 14px; }
-    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-
-    /* ── MODEL METRICS ── */
-    .metrics-section {
-      padding: 80px 60px;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* macOS Window Header */
+    .window-topbar {
+      background: rgba(18, 8, 38, 0.9);
+      border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
       gap: 16px;
     }
 
-    .metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      text-align: center;
+    .window-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .window-title-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .window-body {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 520px;
+      background: #090314;
+    }
+
+    /* Window Mini Sidebar */
+    .window-sidebar {
+      background: rgba(13, 5, 26, 0.95);
+      border-right: 1px solid rgba(168, 85, 247, 0.12);
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ws-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
       transition: all 0.2s;
     }
 
-    .metric-card:hover {
-      border-color: var(--accent-blue);
-      box-shadow: 0 4px 20px rgba(99,179,237,0.15);
+    .ws-item:hover {
+      background: rgba(168, 85, 247, 0.08);
+      color: #fff;
     }
 
-    .metric-model {
-      font-size: 13px; font-weight: 700;
-      color: var(--text-primary); margin-bottom: 8px;
+    .ws-item.active {
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #fff;
+      font-weight: 600;
     }
 
-    .metric-acc {
-      font-size: 28px; font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      margin-bottom: 4px;
+    .ws-item i {
+      font-size: 14px;
+      color: var(--purple-light);
     }
 
-    .metric-best { color: var(--accent-green); }
-    .metric-good { color: var(--accent-blue); }
-    .metric-ok   { color: var(--accent-yellow); }
-    .metric-label { font-size: 11px; color: var(--text-muted); }
+    /* Window Main Panel */
+    .window-main {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
 
-    /* ── NEWS PREVIEW ── */
-    .news-preview-grid {
+    /* Window Main Top Bar */
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title-group h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title-group .panel-url {
+      font-size: 11px;
+      color: var(--purple-light);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .panel-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .date-filter-pill {
+      background: rgba(22, 10, 44, 0.9);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .window-search {
+      display: flex;
+      align-items: center;
+      background: rgba(20, 8, 40, 0.9);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 8px;
+      padding: 6px 12px;
+      gap: 8px;
+    }
+
+    .window-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 12px;
+      color: #fff;
+      width: 140px;
+    }
+
+    .search-key-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--purple-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Metrics Grid */
+    .panel-grid-top {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+
+    .metric-box {
+      background: rgba(15, 6, 30, 0.85);
+      border: 1px solid rgba(168, 85, 247, 0.18);
+      border-radius: 12px;
+      padding: 18px;
+      position: relative;
+    }
+
+    .mb-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .mb-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .mb-val-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .mb-val {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .tag-change-up {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-accent);
+      background: rgba(74, 222, 128, 0.12);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    .tag-change-down {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--red-accent);
+      background: rgba(248, 113, 113, 0.12);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    /* Wave SVG Sparkline with play indicator */
+    .wave-chart-wrap {
+      position: relative;
+      height: 120px;
+      width: 100%;
+    }
+
+    .chart-marker {
+      position: absolute;
+      top: 25px;
+      left: 56%;
+      transform: translateX(-50%);
+      background: rgba(26, 12, 54, 0.95);
+      border: 1px solid var(--purple-accent);
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .marker-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple-accent);
+    }
+
+    .marker-circle-pulse {
+      position: absolute;
+      top: 50px;
+      left: 56%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.35);
+      border: 1px solid var(--purple-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+      cursor: pointer;
+    }
+
+    .marker-circle-pulse i {
+      font-size: 14px;
+      color: #fff;
+      margin-left: 2px;
+    }
+
+    /* Keywords list in metric card 2 */
+    .kw-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .kw-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .kw-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    .kw-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--purple-accent);
+      flex-shrink: 0;
+    }
+
+    /* Bottom Traffic Chart in Mockup */
+    .traffic-box {
+      background: rgba(15, 6, 30, 0.85);
+      border: 1px solid rgba(168, 85, 247, 0.18);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .traffic-chart-wrap {
+      position: relative;
+      height: 90px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    /* ── 6-FEATURE GRID (BOTTOM) ── */
+    .features-section {
+      padding: 40px 0 100px;
+    }
+
+    .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 32px 24px;
     }
 
-    .news-prev-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
+    .feature-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feat-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feat-icon {
+      font-size: 16px;
+      color: var(--purple-light);
+    }
+
+    .feat-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .feat-pill-new {
+      background: rgba(124, 58, 237, 0.25);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: var(--purple-light);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+    }
+
+    .feat-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── LIVE INTERACTIVE PREDICTION DRAWER ── */
+    .predict-box {
+      background: rgba(16, 7, 34, 0.85);
+      border: 1px solid var(--purple-border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 70px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .predict-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .predict-header h4 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .predict-input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .predict-textarea {
+      flex: 1;
+      background: rgba(10, 4, 20, 0.95);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      outline: none;
+      resize: vertical;
+      min-height: 52px;
+      transition: border-color 0.2s;
+    }
+
+    .predict-textarea:focus {
+      border-color: var(--purple-accent);
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.3);
+    }
+
+    .btn-predict {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 26px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: var(--font-sans);
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
     }
 
-    .news-prev-card:hover {
-      border-color: var(--accent-blue);
-      transform: translateY(-3px);
+    .btn-predict:hover {
+      background: linear-gradient(135deg, #8b5cf6, #c084fc);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
     }
 
-    .news-prev-source {
-      font-size: 11px; color: var(--accent-blue);
-      font-weight: 600; letter-spacing: 0.5px;
-      text-transform: uppercase; margin-bottom: 10px;
+    .predict-result-card {
+      display: none;
+      background: rgba(26, 12, 54, 0.6);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 14px;
+      animation: fadeIn 0.3s ease;
     }
 
-    .news-prev-title {
-      font-size: 14px; font-weight: 600;
-      line-height: 1.5; color: var(--text-primary);
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ── FOOTER ── */
     footer {
-      padding: 28px 60px;
-      display: flex; align-items: center;
+      border-top: 1px solid rgba(168, 85, 247, 0.15);
+      padding: 40px 0 50px;
+      display: flex;
+      align-items: center;
       justify-content: space-between;
-      border-top: 1px solid var(--border);
-      background: var(--bg-secondary);
+      color: var(--text-dim);
+      font-size: 13px;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
-    .footer-logo { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-    .footer-logo span { color: var(--accent-blue); }
-    .footer-copy { font-size: 13px; color: var(--text-muted); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .sidebar { width: 60px; padding: 16px 8px; }
-      .sidebar-logo .logo-text, .nav-item span, .nav-section, .sidebar-footer { display: none; }
-      .nav-item { justify-content: center; }
-      .main { margin-left: 60px; }
-      .hero { grid-template-columns: 1fr; padding: 40px 24px; gap: 40px; }
-      .hero-title { font-size: 36px; }
-      .stats-bar { grid-template-columns: repeat(2, 1fr); }
-      .steps-grid { grid-template-columns: repeat(2, 1fr); }
-      .section { padding: 60px 24px; }
-      .news-preview-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-weight: 700;
     }
 
-    /* ── ANIMATIONS ── */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s ease forwards;
+    .footer-links {
+      display: flex;
+      gap: 20px;
     }
 
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
+    .footer-link {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
     }
 
-    .fade-up:nth-child(1) { animation-delay: 0.1s; }
-    .fade-up:nth-child(2) { animation-delay: 0.2s; }
-    .fade-up:nth-child(3) { animation-delay: 0.3s; }
-    .fade-up:nth-child(4) { animation-delay: 0.4s; }
+    .footer-link:hover {
+      color: var(--purple-light);
+    }
 
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 3px; }
+    /* Responsive */
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 40px 0;
+      }
+      .hero-3d-scene {
+        height: 320px;
+      }
+      .window-body {
+        grid-template-columns: 1fr;
+      }
+      .window-sidebar {
+        display: none;
+      }
+      .panel-grid-top {
+        grid-template-columns: 1fr;
+      }
+      .features-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .pill-nav {
+        padding: 8px 12px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .hero-title {
+        font-size: 40px;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
 
-<!-- ══ SIDEBAR ══ -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">📊</div>
-    <div class="logo-text">Senti<span>lytics</span></div>
-  </div>
-
-  <div class="nav-section">Navigation</div>
-  <a href="/" class="nav-item active"><i class="bi bi-house-door"></i> <span>Home</span></a>
-  <a href="/dashboard" class="nav-item"><i class="bi bi-bar-chart-line"></i> <span>Dashboard</span></a>
-  <a href="/about" class="nav-item"><i class="bi bi-info-circle"></i> <span>About</span></a>
-
-  <div class="nav-section">Model</div>
-  <a href="#" class="nav-item"><i class="bi bi-cpu"></i> <span>FinBERT</span></a>
-  <a href="#" class="nav-item"><i class="bi bi-graph-up-arrow"></i> <span>Metrics</span></a>
-
-  <div class="sidebar-footer">
-    <span class="model-badge">● {{ model_name or 'FinBERT' }}</span>
-    <small style="color: var(--text-muted); font-size: 11px;">
-      {%- if model_metrics and model_metrics.accuracy is defined -%}
-        Accuracy: {{ "%.2f"|format(model_metrics.accuracy * 100) }}%
-      {%- elif model_metrics and model_metrics.status is defined -%}
-        {{ model_metrics.status }}
-      {%- else -%}
-        Accuracy: n/a
-      {%- endif -%}
-    </small>
-  </div>
-</aside>
-
-<!-- ══ MAIN ══ -->
-<main class="main">
-
-  <!-- Topbar -->
-  <div class="topbar">
-    <div style="font-size: 13px; color: var(--text-muted);">
-      <span style="color: var(--accent-green); font-size: 8px;">●</span>&nbsp;
-      Real-time financial sentiment analysis powered by FinBERT
-    </div>
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <a href="/dashboard" style="font-size: 13px; color: var(--accent-blue); text-decoration: none; font-weight: 600;">
-        <i class="bi bi-bar-chart-line"></i> Open Dashboard →
+  <!-- ── FLOATING PILL NAVBAR ── -->
+  <div class="nav-wrapper">
+    <nav class="pill-nav">
+      <a href="/" class="nav-brand">
+        <div class="nav-logo-icon">
+          <i class="bi bi-cpu-fill"></i>
+        </div>
+        <span>Sentilytics</span>
       </a>
-      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── HERO ── -->
-  <section class="hero">
-    <div>
-      <div class="hero-eyebrow">
-        <i class="bi bi-stars"></i> AI-Powered · Real-Time · FinBERT
-      </div>
-      <h1 class="hero-title">
-        Financial News<br>
-        <span class="highlight">Sentiment Analysis</span><br>
-        That Actually Works
-      </h1>
-      <p class="hero-desc">
-        Sentilytics uses FinBERT — a transformer model fine-tuned on financial text —
-        to analyze market news, detect sentiment, and generate actionable
-        trading signals. Signals are heuristic; see the About page for limitations.
-      </p>
-      <div class="hero-cta">
-        <a href="/dashboard" class="btn-primary-hero">
-          <i class="bi bi-bar-chart-line"></i> Open Dashboard
-        </a>
-        <a href="/about" class="btn-outline-hero">
-          <i class="bi bi-people"></i> Meet the Team
-        </a>
-      </div>
-    </div>
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="/dashboard" class="nav-link">Live Dashboard</a></li>
+        <li><a href="#model-metrics" class="nav-link">FinBERT Benchmarks</a></li>
+        <li><a href="/about" class="nav-link">About</a></li>
+      </ul>
 
-    <!-- Live preview card -->
-    <div class="hero-visual">
-      <div class="hero-chart-card">
-        <div class="hcc-title">
-          <i class="bi bi-activity" style="color: var(--accent-green)"></i>
-          &nbsp;Live Sentiment Feed
-        </div>
-
-        <div class="hcc-row">
-          <div>
-            <div class="hcc-company">Apple Inc.</div>
-            <div class="hcc-symbol">AAPL · NASDAQ</div>
-          </div>
-          <span class="hcc-badge hcc-pos">Positive</span>
-          <span class="hcc-change up">▲ +2.3%</span>
-        </div>
-
-        <div class="hcc-row">
-          <div>
-            <div class="hcc-company">Tesla</div>
-            <div class="hcc-symbol">TSLA · NASDAQ</div>
-          </div>
-          <span class="hcc-badge hcc-neg">Negative</span>
-          <span class="hcc-change down">▼ -1.8%</span>
-        </div>
-
-        <div class="hcc-row">
-          <div>
-            <div class="hcc-company">NVIDIA</div>
-            <div class="hcc-symbol">NVDA · NASDAQ</div>
-          </div>
-          <span class="hcc-badge hcc-pos">Positive</span>
-          <span class="hcc-change up">▲ +4.1%</span>
-        </div>
-
-        <div class="hcc-row">
-          <div>
-            <div class="hcc-company">Microsoft</div>
-            <div class="hcc-symbol">MSFT · NASDAQ</div>
-          </div>
-          <span class="hcc-badge hcc-neu">Neutral</span>
-          <span class="hcc-change" style="color: var(--text-muted)">● +0.2%</span>
-        </div>
-
-        <div class="hcc-row">
-          <div>
-            <div class="hcc-company">Reliance</div>
-            <div class="hcc-symbol">RELIANCE.NS · NSE</div>
-          </div>
-          <span class="hcc-badge hcc-pos">Positive</span>
-          <span class="hcc-change up">▲ +1.5%</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── STATS BAR ── -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-number" id="statAccuracy">
-        {%- if model_metrics and model_metrics.accuracy is defined -%}
-          {{ "%.1f"|format(model_metrics.accuracy * 100) }}<span style="font-size: 20px">%</span>
-        {%- else -%}
-          n/a
-        {%- endif -%}
-      </div>
-      <div class="stat-label">Model Accuracy</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-number">{{ companies|length if companies else 10 }}</div>
-      <div class="stat-label">Companies Tracked</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-number">
-        {%- if model_metrics and model_metrics.models is defined -%}
-          {{ model_metrics.models|length }}
-        {%- else -%}
-          7
-        {%- endif -%}
-      </div>
-      <div class="stat-label">ML Models Compared</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-number">2h</div>
-      <div class="stat-label">Update Frequency</div>
-    </div>
-  </div>
-
-  <!-- ── HOW IT WORKS ── -->
-  <section class="section">
-    <div class="section-header">
-      <div class="section-eyebrow">How It Works</div>
-      <h2 class="section-title">From News to Trading Signal</h2>
-      <p class="section-sub">Four steps from raw news article to an actionable market insight.</p>
-    </div>
-
-    <div class="steps-grid">
-      <div class="step-card fade-up">
-        <div class="step-num">01</div>
-        <div class="step-icon">📡</div>
-        <div class="step-title">Fetch News</div>
-        <div class="step-desc">NewsAPI pulls the latest financial articles every 2 hours across 10 major companies.</div>
-      </div>
-      <div class="step-card fade-up">
-        <div class="step-num">02</div>
-        <div class="step-icon">🧠</div>
-        <div class="step-title">Analyze Sentiment</div>
-        <div class="step-desc">FinBERT + VADER hybrid analyzes each headline and classifies it as Positive, Negative, or Neutral.</div>
-      </div>
-      <div class="step-card fade-up">
-        <div class="step-num">03</div>
-        <div class="step-icon">📈</div>
-        <div class="step-title">Fetch Stock Data</div>
-        <div class="step-desc">yFinance pulls real-time price data to measure the market's actual reaction to the news.</div>
-      </div>
-      <div class="step-card fade-up">
-        <div class="step-num">04</div>
-        <div class="step-icon">💡</div>
-        <div class="step-title">Generate Signal</div>
-        <div class="step-desc">Smart logic combines sentiment + price movement to produce BUY / SELL / HOLD suggestions.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── MODEL METRICS ── -->
-  <section class="metrics-section">
-    <div class="section-header">
-      <div class="section-eyebrow">Model Comparison</div>
-      <h2 class="section-title">Why FinBERT Wins</h2>
-      <p class="section-sub">We trained and benchmarked 7 models. FinBERT outperformed every baseline.</p>
-    </div>
-
-    <div class="metrics-grid">
-      {%- if model_metrics and model_metrics.models is defined and model_metrics.models|length > 0 -%}
-        {%- set best_acc = model_metrics.models | map(attribute='accuracy') | max -%}
-        {%- for m in model_metrics.models | sort(attribute='accuracy', reverse=True) -%}
-          {%- set acc_val = m.accuracy -%}
-          {%- if acc_val > 1 %}{% set pct = "%.2f"|format(acc_val) %}{% else %}{% set pct = "%.2f"|format(acc_val * 100) %}{% endif -%}
-        <div class="metric-card">
-          <div class="metric-model">{{ m.model_name or m.get('model', m.get('Model', 'Unknown')) }}</div>
-          <div class="metric-acc {% if acc_val == best_acc %}metric-best{% elif acc_val >= (best_acc * 0.98 if best_acc <= 1 else best_acc * 0.98) %}metric-good{% else %}metric-ok{% endif %}">
-            {{ pct }}%</div>
-          <div class="metric-label">{% if acc_val == best_acc %}Best Model ★{% else %}F1: {{ "%.3f"|format(m.get('f1_macro', m.get('macro_f1', 0))) }}{% endif %}</div>
-        </div>
-        {%- endfor -%}
-      {%- elif model_metrics and model_metrics.accuracy is defined -%}
-        <div class="metric-card">
-          <div class="metric-model">{{ model_name or 'FinBERT' }}</div>
-          <div class="metric-acc metric-best">{{ "%.2f"|format(model_metrics.accuracy * 100) }}%</div>
-          <div class="metric-label">Best Model ★</div>
-        </div>
-        <div class="metric-card" style="grid-column: span 3; text-align:center; color: var(--text-muted); font-size: 13px; padding: 32px;">
-          Run <code style="color:var(--accent-blue)">python -m src.models.baseline</code> to populate the full comparison table.
-        </div>
-      {%- else -%}
-        <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-muted);">
-          <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
-          <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Model metrics not available</div>
-          <div style="font-size: 13px;">Run <code style="color:var(--accent-blue)">python -m src.models.baseline</code> then <code style="color:var(--accent-blue)">python -m src.models.transformer</code> to generate metrics.</div>
-        </div>
-      {%- endif -%}
-    </div>
-  </section>
-
-  <!-- ── LATEST NEWS PREVIEW ── -->
-  {% if news and news|length > 0 %}
-  <section class="section">
-    <div class="section-header">
-      <div class="section-eyebrow">Latest News</div>
-      <h2 class="section-title">What the Market Is Talking About</h2>
-    </div>
-
-    <div class="news-preview-grid">
-      {% for item in news[:6] %}
-      <div class="news-prev-card">
-        <div class="news-prev-source">{{ item.source or "News" }} · {{ item.company }}</div>
-        <div class="news-prev-title">{{ item.title }}</div>
-      </div>
-      {% endfor %}
-    </div>
-
-    <div style="text-align: center; margin-top: 32px;">
-      <a href="/dashboard" class="btn-primary-hero">
-        <i class="bi bi-bar-chart-line"></i> View Full Dashboard with Sentiment Analysis
+      <a href="/dashboard" class="btn-nav-cta">
+        <span>Open Dashboard</span>
+        <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
       </a>
+    </nav>
+  </div>
+
+  <main class="container">
+
+    <!-- ── HERO SECTION ── -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-badge-pill">
+          <span class="badge-dot"></span>
+          <span>Latest integration: TinyFish Live Web Agent</span>
+        </div>
+
+        <h1 class="hero-title">
+          Elevate your<br>
+          <span style="color: #fff;">market insights.</span>
+        </h1>
+
+        <p class="hero-desc">
+          Unlock the full potential of financial news with our AI engine, designed to streamline sentiment scoring, live price correlation, and automated trading signals.
+        </p>
+
+        <!-- Quick Analyze Form -->
+        <form class="hero-form" onsubmit="handleHeroSubmit(event)">
+          <input 
+            type="text" 
+            id="heroSearchInput" 
+            class="hero-input" 
+            placeholder="Enter stock ticker (AAPL, TSLA, NVDA) or headline..." 
+            value="NVIDIA reports surging Q4 datacenter and AI accelerator demand"
+          />
+          <button type="submit" class="hero-btn">Analyze live</button>
+        </form>
+
+        <!-- Brand / Ticker Proof Strip -->
+        <div class="hero-proof">
+          <span class="proof-label">Supported equities:</span>
+          <div class="proof-logos">
+            <span class="proof-item"><i class="bi bi-apple"></i> Apple</span>
+            <span class="proof-item"><i class="bi bi-lightning-charge-fill"></i> Tesla</span>
+            <span class="proof-item"><i class="bi bi-gpu-card"></i> NVIDIA</span>
+            <span class="proof-item"><i class="bi bi-microsoft"></i> Microsoft</span>
+            <span class="proof-item"><i class="bi bi-google"></i> Google</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 3D FLOATING ISOMETRIC CUBES SCENE ── -->
+      <div class="hero-3d-scene">
+        <div class="ambient-glow-cube"></div>
+
+        <div class="isometric-cube-group">
+          <!-- Cube 1 (Top right large) -->
+          <svg class="cube-item cube-1" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,30 50,55 5,30" fill="url(#cubeTopGrad1)" stroke="rgba(192, 132, 252, 0.6)" stroke-width="1.2"/>
+            <polygon points="5,30 50,55 50,105 5,80" fill="url(#cubeLeftGrad1)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="1.2"/>
+            <polygon points="50,55 95,30 95,80 50,105" fill="url(#cubeRightGrad1)" stroke="rgba(192, 132, 252, 0.5)" stroke-width="1.2"/>
+            <defs>
+              <linearGradient id="cubeTopGrad1" x1="5" y1="5" x2="95" y2="55" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#4c1d95"/>
+                <stop offset="1" stop-color="#2e1065"/>
+              </linearGradient>
+              <linearGradient id="cubeLeftGrad1" x1="5" y1="30" x2="50" y2="105" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#1e0c3b"/>
+                <stop offset="1" stop-color="#0f051e"/>
+              </linearGradient>
+              <linearGradient id="cubeRightGrad1" x1="50" y1="55" x2="95" y2="105" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#581c87"/>
+                <stop offset="1" stop-color="#240742"/>
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <!-- Cube 2 (Top center) -->
+          <svg class="cube-item cube-2" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,30 50,55 5,30" fill="url(#cubeTopGrad2)" stroke="rgba(216, 180, 254, 0.7)" stroke-width="1.2"/>
+            <polygon points="5,30 50,55 50,105 5,80" fill="url(#cubeLeftGrad2)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="1.2"/>
+            <polygon points="50,55 95,30 95,80 50,105" fill="url(#cubeRightGrad2)" stroke="rgba(168, 85, 247, 0.5)" stroke-width="1.2"/>
+            <defs>
+              <linearGradient id="cubeTopGrad2" x1="5" y1="5" x2="95" y2="55" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6b21a8"/>
+                <stop offset="1" stop-color="#3b0764"/>
+              </linearGradient>
+              <linearGradient id="cubeLeftGrad2" x1="5" y1="30" x2="50" y2="105" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#190730"/>
+                <stop offset="1" stop-color="#0a0214"/>
+              </linearGradient>
+              <linearGradient id="cubeRightGrad2" x1="50" y1="55" x2="95" y2="105" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#7e22ce"/>
+                <stop offset="1" stop-color="#3b0764"/>
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <!-- Cube 3 (Mid Left) -->
+          <svg class="cube-item cube-3" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,30 50,55 5,30" fill="url(#cubeTopGrad1)" stroke="rgba(192, 132, 252, 0.6)" stroke-width="1.2"/>
+            <polygon points="5,30 50,55 50,105 5,80" fill="url(#cubeLeftGrad1)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="1.2"/>
+            <polygon points="50,55 95,30 95,80 50,105" fill="url(#cubeRightGrad1)" stroke="rgba(192, 132, 252, 0.5)" stroke-width="1.2"/>
+          </svg>
+
+          <!-- Cube 4 (Center small) -->
+          <svg class="cube-item cube-4" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,30 50,55 5,30" fill="url(#cubeTopGrad2)" stroke="rgba(216, 180, 254, 0.8)" stroke-width="1.2"/>
+            <polygon points="5,30 50,55 50,105 5,80" fill="url(#cubeLeftGrad2)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="1.2"/>
+            <polygon points="50,55 95,30 95,80 50,105" fill="url(#cubeRightGrad2)" stroke="rgba(168, 85, 247, 0.6)" stroke-width="1.2"/>
+          </svg>
+
+          <!-- Cube 5 (Mid Bottom) -->
+          <svg class="cube-item cube-5" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,30 50,55 5,30" fill="url(#cubeTopGrad1)" stroke="rgba(192, 132, 252, 0.6)" stroke-width="1.2"/>
+            <polygon points="5,30 50,55 50,105 5,80" fill="url(#cubeLeftGrad1)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="1.2"/>
+            <polygon points="50,55 95,30 95,80 50,105" fill="url(#cubeRightGrad1)" stroke="rgba(192, 132, 252, 0.5)" stroke-width="1.2"/>
+          </svg>
+
+          <!-- Cube 6 (Bottom right) -->
+          <svg class="cube-item cube-6" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,30 50,55 5,30" fill="url(#cubeTopGrad2)" stroke="rgba(192, 132, 252, 0.6)" stroke-width="1.2"/>
+            <polygon points="5,30 50,55 50,105 5,80" fill="url(#cubeLeftGrad2)" stroke="rgba(147, 51, 234, 0.4)" stroke-width="1.2"/>
+            <polygon points="50,55 95,30 95,80 50,105" fill="url(#cubeRightGrad2)" stroke="rgba(192, 132, 252, 0.5)" stroke-width="1.2"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LIVE INLINE PREDICTOR RESULTS (TRIGGERED BY HERO SEARCH) ── -->
+    <div id="quickPredictBox" class="predict-result-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:12px; font-weight:700; color:var(--purple-light); text-transform:uppercase; letter-spacing:0.5px;">FinBERT Real-time Inference</span>
+        <span id="quickPredictModel" style="font-size:11px; font-family:var(--font-mono); color:var(--text-dim);">Model: FinBERT</span>
+      </div>
+      <div id="quickPredictText" style="font-size:14px; color:#fff; font-weight:600; margin-bottom:10px;"></div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div>Sentiment: <strong id="quickPredictLabel" style="font-size:15px;"></strong></div>
+        <div>Confidence: <strong id="quickPredictConf" style="font-family:var(--font-mono); color:var(--purple-light);"></strong></div>
+        <a href="/dashboard" style="margin-left:auto; font-size:12px; color:var(--purple-light); text-decoration:none;">Open in Dashboard →</a>
+      </div>
     </div>
-  </section>
-  {% endif %}
 
-  <!-- ── FOOTER ── -->
-  <footer>
-    <div class="footer-logo">Senti<span>lytics</span></div>
-    <div class="footer-copy">© 2025 Sentilytics · Built with ❤️ by Team Sentilytics · BTech Final Year Project</div>
-  </footer>
+    <!-- ── CENTER SECTION: EVERYTHING YOU NEED ── -->
+    <section class="section-centered" id="features">
+      <div class="centered-badge-pill">
+        <span>Everything you need</span>
+      </div>
 
-</main>
+      <h2 class="centered-title">
+        Harness the power of AI, making financial sentiment analysis intuitive and effective for all skill levels.
+      </h2>
+    </section>
 
-<script>
-  function toggleTheme() {
-    const html = document.documentElement;
-    const icon = document.getElementById('themeIcon');
-    if (html.getAttribute('data-theme') === 'dark') {
-      html.setAttribute('data-theme', 'light');
-      icon.className = 'bi bi-sun-fill';
-    } else {
-      html.setAttribute('data-theme', 'dark');
-      icon.className = 'bi bi-moon-stars-fill';
+    <!-- ── FEATURED MAC-OS DASHBOARD WINDOW MOCKUP ── -->
+    <div class="window-container">
+      <div class="window-ambient-backlight"></div>
+
+      <div class="mockup-window">
+        <!-- Window Top Bar -->
+        <div class="window-topbar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="window-title-bar">
+            <span>sentilytics-terminal</span>
+            <span>—</span>
+            <span>finbert-pipeline.prod</span>
+          </div>
+        </div>
+
+        <!-- Window Body -->
+        <div class="window-body">
+          <!-- Sidebar -->
+          <div class="window-sidebar">
+            <a href="/dashboard" class="ws-item active">
+              <i class="bi bi-grid-fill"></i>
+              <span>Market Overview</span>
+            </a>
+            <a href="/dashboard" class="ws-item">
+              <i class="bi bi-graph-up-arrow"></i>
+              <span>Analytics</span>
+            </a>
+            <a href="/dashboard" class="ws-item">
+              <i class="bi bi-robot"></i>
+              <span>TinyFish Web Agent</span>
+            </a>
+            <a href="/dashboard" class="ws-item">
+              <i class="bi bi-compass"></i>
+              <span>Signals & Goals</span>
+            </a>
+            <a href="/dashboard" class="ws-item">
+              <i class="bi bi-newspaper"></i>
+              <span>Content Evaluation</span>
+            </a>
+            <a href="/dashboard" class="ws-item">
+              <i class="bi bi-shield-check"></i>
+              <span>Accuracy Audit</span>
+            </a>
+            <a href="/dashboard" class="ws-item">
+              <i class="bi bi-link-45deg"></i>
+              <span>Price Correlations</span>
+            </a>
+          </div>
+
+          <!-- Main Content Area -->
+          <div class="window-main">
+            <!-- Header -->
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3>Site Overview</h3>
+                <a href="/dashboard" class="panel-url">
+                  <span>www.sentilytics.ai/live-feed</span>
+                  <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+              </div>
+
+              <div class="panel-controls">
+                <div class="date-filter-pill">
+                  <i class="bi bi-calendar3"></i>
+                  <span>Jun 24 → Today</span>
+                </div>
+
+                <div class="window-search">
+                  <i class="bi bi-search" style="font-size: 11px; color: var(--text-dim);"></i>
+                  <input type="text" placeholder="Search" />
+                  <span class="search-key-badge">⌘K</span>
+                </div>
+
+                <a href="/dashboard" style="background: var(--purple-accent); color: #fff; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                  <i class="bi bi-plus" style="font-size: 18px;"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Top Metrics Row -->
+            <div class="panel-grid-top">
+              <!-- Metric 1: Visibility / Accuracy -->
+              <div class="metric-box">
+                <div class="mb-header">
+                  <span class="mb-title">Visibility & Sentiment Accuracy</span>
+                  <i class="bi bi-info-circle" style="font-size: 11px; color: var(--text-dim);"></i>
+                </div>
+                <div class="mb-val-row">
+                  <span class="mb-val">
+                    {%- if model_metrics and model_metrics.accuracy is defined -%}
+                      {{ "%.2f"|format(model_metrics.accuracy * 100) }}%
+                    {%- else -%}
+                      10.15%
+                    {%- endif -%}
+                  </span>
+                  <span class="tag-change-up">+5.8%</span>
+                </div>
+
+                <!-- Wave Graph with Interactive Pulse Node -->
+                <div class="wave-chart-wrap">
+                  <svg viewBox="0 0 400 120" style="width: 100%; height: 100%; overflow: visible;" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="waveFillGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.0"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M 0,90 Q 60,85 110,65 T 224,50 T 320,80 T 400,60 L 400,120 L 0,120 Z" fill="url(#waveFillGrad)"/>
+                    <path d="M 0,90 Q 60,85 110,65 T 224,50 T 320,80 T 400,60" fill="none" stroke="#a855f7" stroke-width="2.5"/>
+                  </svg>
+
+                  <!-- Jun 18 marker matching screenshot -->
+                  <div class="chart-marker">
+                    <span class="marker-dot"></span>
+                    <span>Jun 18 &nbsp; 9.8%</span>
+                  </div>
+
+                  <!-- Center circular play/action node -->
+                  <a href="/dashboard" class="marker-circle-pulse" title="Inspect Signal Bar">
+                    <i class="bi bi-play-fill"></i>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Metric 2: Organic Keywords / Drivers -->
+              <div class="metric-box">
+                <div class="mb-header">
+                  <span class="mb-title">Organic Sentiment Drivers</span>
+                  <i class="bi bi-info-circle" style="font-size: 11px; color: var(--text-dim);"></i>
+                </div>
+                <div class="mb-val-row">
+                  <span class="mb-val">35.6K</span>
+                  <span class="tag-change-down">-2.5%</span>
+                </div>
+
+                <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 8px;">Top Market Drivers</div>
+
+                <div class="kw-list">
+                  <div class="kw-item">
+                    <div class="kw-left">
+                      <span class="kw-dot"></span>
+                      <span>online payment processing</span>
+                    </div>
+                    <span>AAPL</span>
+                  </div>
+                  <div class="kw-item">
+                    <div class="kw-left">
+                      <span class="kw-dot"></span>
+                      <span>secure cloud transactions</span>
+                    </div>
+                    <span>MSFT</span>
+                  </div>
+                  <div class="kw-item">
+                    <div class="kw-left">
+                      <span class="kw-dot"></span>
+                      <span>autonomous hardware platform</span>
+                    </div>
+                    <span>TSLA</span>
+                  </div>
+                  <div class="kw-item">
+                    <div class="kw-left">
+                      <span class="kw-dot"></span>
+                      <span>accelerated computing nodes</span>
+                    </div>
+                    <span>NVDA</span>
+                  </div>
+                  <div class="kw-item">
+                    <div class="kw-left">
+                      <span class="kw-dot"></span>
+                      <span>e-commerce fulfillment margin</span>
+                    </div>
+                    <span>AMZN</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Traffic Metric Card -->
+            <div class="traffic-box">
+              <div class="mb-header">
+                <span class="mb-title">Market Ingestion Volume & Signals</span>
+                <i class="bi bi-info-circle" style="font-size: 11px; color: var(--text-dim);"></i>
+              </div>
+              <div class="mb-val-row">
+                <span class="mb-val">59.8K</span>
+                <span class="tag-change-up">+10.7%</span>
+              </div>
+
+              <div class="traffic-chart-wrap">
+                <svg viewBox="0 0 800 90" style="width: 100%; height: 100%;" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="trafficGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Horizontal grid lines -->
+                  <line x1="0" y1="20" x2="800" y2="20" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+                  <line x1="0" y1="60" x2="800" y2="60" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4"/>
+
+                  <!-- Area fill and line -->
+                  <path d="M 0,80 Q 120,85 240,70 T 480,50 T 640,65 T 800,45 L 800,90 L 0,90 Z" fill="url(#trafficGrad)"/>
+                  <path d="M 0,80 Q 120,85 240,70 T 480,50 T 640,65 T 800,45" fill="none" stroke="#a855f7" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6-FEATURE GRID (BOTTOM - EXACT COPY OF SCREENSHOT) ── -->
+    <section class="features-section">
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-item">
+          <div class="feat-header">
+            <i class="bi bi-speedometer2 feat-icon"></i>
+            <h3 class="feat-title">User-friendly dashboard</h3>
+          </div>
+          <p class="feat-desc">Perform complex market audits and sentiment scoring with a single click.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-item">
+          <div class="feat-header">
+            <i class="bi bi-bar-chart-fill feat-icon"></i>
+            <h3 class="feat-title">Visual reports</h3>
+          </div>
+          <p class="feat-desc">Visual insights into your stock's intraday price performance around publication.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-item">
+          <div class="feat-header">
+            <i class="bi bi-stars feat-icon"></i>
+            <h3 class="feat-title">Smart Keyword Generator</h3>
+            <span class="feat-pill-new">NEW</span>
+          </div>
+          <p class="feat-desc">Automatic sentiment suggestions and the best stock tickers to target via TinyFish.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-item">
+          <div class="feat-header">
+            <i class="bi bi-file-text-fill feat-icon"></i>
+            <h3 class="feat-title">Content evaluation</h3>
+          </div>
+          <p class="feat-desc">Simple corrections and domain-specific classification for immediate signal improvements.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-item">
+          <div class="feat-header">
+            <i class="bi bi-bullseye feat-icon"></i>
+            <h3 class="feat-title">SEO & trading goal setting</h3>
+          </div>
+          <p class="feat-desc">Helps you set and achieve market goals with guided algorithmic assistance.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-item">
+          <div class="feat-header">
+            <i class="bi bi-bell-fill feat-icon"></i>
+            <h3 class="feat-title">Automated alerts</h3>
+          </div>
+          <p class="feat-desc">Automatic notifications about your market sentiment health, including quick fixes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+      <div class="footer-brand">
+        <div class="nav-logo-icon" style="width: 22px; height: 22px; font-size: 11px;">
+          <i class="bi bi-cpu-fill"></i>
+        </div>
+        <span>Sentilytics</span>
+      </div>
+
+      <div>
+        <span>© 2026 Sentilytics · Powered by FinBERT & TinyFish API</span>
+      </div>
+
+      <div class="footer-links">
+        <a href="/dashboard" class="footer-link">Live Dashboard</a>
+        <a href="/about" class="footer-link">Documentation & About</a>
+        <a href="/api/results" class="footer-link">REST API</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    async function handleHeroSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('heroSearchInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      const resultBox = document.getElementById('quickPredictBox');
+      const labelEl = document.getElementById('quickPredictLabel');
+      const confEl = document.getElementById('quickPredictConf');
+      const textEl = document.getElementById('quickPredictText');
+
+      if (resultBox) {
+        resultBox.style.display = 'block';
+        textEl.textContent = `"${text}"`;
+        labelEl.textContent = "Analyzing headline with FinBERT...";
+        labelEl.style.color = "var(--purple-light)";
+        confEl.textContent = "...";
+      }
+
+      try {
+        const resp = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+        const data = await resp.json();
+        if (data && data.predictions && data.predictions.length > 0) {
+          const pred = data.predictions[0];
+          labelEl.textContent = pred.label;
+          if (pred.label === 'Positive') {
+            labelEl.style.color = 'var(--green-accent)';
+          } else if (pred.label === 'Negative') {
+            labelEl.style.color = 'var(--red-accent)';
+          } else {
+            labelEl.style.color = 'var(--text-muted)';
+          }
+          confEl.textContent = (pred.confidence * 100).toFixed(1) + '%';
+        } else {
+          labelEl.textContent = "Neutral / Unclear";
+          confEl.textContent = "N/A";
+        }
+      } catch (err) {
+        labelEl.textContent = "Ready (View in Dashboard)";
+        confEl.textContent = "OK";
+      }
     }
-  }
-</script>
+  </script>
 </body>
 </html>

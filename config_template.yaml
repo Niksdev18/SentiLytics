@@ -9,6 +9,10 @@
 # ──────────────────────────────────────────────
 
 api_keys:
+  # Your TinyFish API key (https://agent.tinyfish.ai)
+  # Override with env var: TINYFISH_API_KEY
+  tinyfish: "YOUR_TINYFISH_API_KEY_HERE"
+
   # Your NewsAPI key (https://newsapi.org/register)
   # Override with env var: NEWSAPI_KEY
   newsapi: "YOUR_NEWSAPI_KEY_HERE"
@@ -23,6 +27,10 @@ model:
   allow_hub_fallback: true
 
 pipeline:
+  # News provider to use: 'tinyfish', 'newsapi', or 'auto'
+  # 'auto' prioritizes TinyFish when TINYFISH_API_KEY is configured
+  news_provider: "auto"
+
   # Number of hours between automatic news refreshes
   refresh_hours: 2
   

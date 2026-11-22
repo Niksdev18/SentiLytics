@@ -52,7 +52,13 @@ def run_pipeline(
 
     if news_fn is None:
         def _default_news_fn(comp: CompanyConfig, key: Optional[str], ps: int) -> List[Dict[str, Any]]:
-            return fetch_company_news(comp, api_key=key, page_size=ps)
+            return fetch_company_news(
+                comp,
+                api_key=key,
+                page_size=ps,
+                tinyfish_api_key=cfg.tinyfish_api_key,
+                provider=cfg.news_provider,
+            )
         news_fn = _default_news_fn
 
     if history_fn is None:
@@ -208,6 +214,7 @@ def run_pipeline(
     results_payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "source": data_source,
+        "news_provider": cfg.news_provider,
         "model_name": engine.model_description if engine else "FinBERT (fine-tuned)",
         "metrics": metrics,
         "companies": companies_summary,
