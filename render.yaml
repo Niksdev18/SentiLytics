@@ -10,9 +10,15 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.0
       - key: DEMO_MODE
-        value: "true"
+        value: "false"
       - key: START_SCHEDULER
         value: "true"
+      - key: TINYFISH_API_KEY
+        sync: false
+      - key: NEWS_PROVIDER
+        value: "tinyfish"
       - key: NEWSAPI_KEY
+        sync: false
+      - key: HF_TOKEN
         sync: false
 
